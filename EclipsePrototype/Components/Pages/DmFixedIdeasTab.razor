@@ -1,0 +1,52 @@
+@page "/dm/fixed-ideas-tab"
+
+<div class="relative z-10 flex flex-col flex-grow">
+    <main class="flex-grow flex flex-col items-center justify-start px-6 py-8 mt-16 max-w-4xl mx-auto w-full">
+        <!-- Page Header -->
+        <div class="w-full text-center md:text-left mb-8">
+            <h2 class="font-headline font-black text-4xl text-on-background tracking-tighter leading-none">
+                Fixed <span class="text-primary-container">Ideas</span>
+            </h2>
+            <p class="text-on-surface-variant text-lg mt-2">Curated insights and entrepreneurial opportunities.</p>
+        </div>
+
+        <!-- Ideas List Section -->
+        <div class="w-full glass-effect border border-outline-variant/10 rounded-3xl p-6 mb-6">
+            <h3 class="text-on-surface font-headline font-bold text-xl mb-4">Explore Opportunities</h3>
+            <div class="flex flex-col gap-6">
+                @if (fixedIdeas.Any())
+                {
+                    @foreach (var idea in fixedIdeas)
+                    {
+                        <div class="bg-surface-container-highest p-4 rounded-2xl">
+                            <h4 class="font-headline font-bold text-lg text-primary-container mb-2">@idea.Title</h4>
+                            <p class="font-body text-sm text-on-surface-variant mb-3">@idea.Description</p>
+                            <button class="bg-primary-container/20 hover:bg-primary-container/30 text-primary-container font-body font-medium py-2 px-4 rounded-lg text-sm transition-colors flex items-center gap-2">
+                                <span class="material-symbols-outlined text-base">visibility</span> Read More (Simulated)
+                            </button>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <p class="text-on-surface-variant text-sm">No fixed ideas available at the moment.</p>
+                }
+            </div>
+        </div>
+    </main>
+</div>
+
+@code {
+    private List<FixedIdea> fixedIdeas = new List<FixedIdea>
+    {
+        new FixedIdea { Title = "Aetheric Energy Harvesting", Description = "Develop new methods for passively collecting ambient Aetheric energy for sustainable power solutions." },
+        new FixedIdea { Title = "Neural Interface for Dream Weaving", Description = "Create a non-invasive device to translate conscious thought into tangible dreamscapes for therapeutic use." },
+        new FixedIdea { Title = "Guardian Legacy Archiving System", Description = "Design a secure, decentralized system for preserving the knowledge and experiences of past Guardians." }
+    };
+
+    public class FixedIdea
+    {
+        public string Title { get; set; }
+        public string Description { get; set; }
+    }
+}

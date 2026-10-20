@@ -1,0 +1,42 @@
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-6 pt-3 bg-[#131313]/80 backdrop-blur-xl rounded-t-[1.5rem] border-t border-[#4D4634]/20 shadow-[0_-10px_30px_rgba(0,0,0,0.5)]">
+    <!-- Journal -->
+    <NavLink class="flex flex-col items-center justify-center text-[#E5E2E1]/60 px-3 py-1 transition-all" ActiveClass="text-[#FFD23F] bg-[#353534] rounded-xl shadow-[0_0_15px_rgba(255,210,63,0.15)] scale-95" href="aether-horizon">
+        <span class="material-symbols-outlined mb-1">auto_stories</span>
+        <span class="font-label font-medium text-[10px] uppercase tracking-widest">Journal</span>
+    </NavLink>
+    
+    <!-- Support / Therapists -->
+    <NavLink class="flex flex-col items-center justify-center text-[#E5E2E1]/60 px-3 py-1 transition-all" ActiveClass="text-[#FFD23F] bg-[#353534] rounded-xl shadow-[0_0_15px_rgba(255,210,63,0.15)] scale-95" href="guardian-creation">
+        <span class="material-symbols-outlined mb-1">support_agent</span>
+        <span class="font-label font-medium text-[10px] uppercase tracking-widest">Support</span>
+    </NavLink>
+    
+    <!-- Messages -->
+    <NavLink class="flex flex-col items-center justify-center text-[#E5E2E1]/60 px-3 py-1 transition-all" ActiveClass="text-[#FFD23F] bg-[#353534] rounded-xl shadow-[0_0_15px_rgba(255,210,63,0.15)] scale-95" href="messages">
+        <span class="material-symbols-outlined mb-1">chat_bubble</span>
+        <span class="font-label font-medium text-[10px] uppercase tracking-widest">Messages</span>
+    </NavLink>
+    
+    <!-- Status -->
+    <NavLink class="flex flex-col items-center justify-center text-[#E5E2E1]/60 px-3 py-1 transition-all" ActiveClass="text-[#FFD23F] bg-[#353534] rounded-xl shadow-[0_0_15px_rgba(255,210,63,0.15)] scale-95" href="status">
+        <span class="material-symbols-outlined mb-1">account_circle</span>
+        <span class="font-label font-medium text-[10px] uppercase tracking-widest">Status</span>
+    </NavLink>
+    
+    <!-- Ideas -->
+    <NavLink class="flex flex-col items-center justify-center text-[#E5E2E1]/60 px-3 py-1 transition-all" ActiveClass="text-[#FFD23F] bg-[#353534] rounded-xl shadow-[0_0_15px_rgba(255,210,63,0.15)] scale-95" href="ideas">
+        <span class="material-symbols-outlined mb-1">lightbulb</span>
+        <span class="font-label font-medium text-[10px] uppercase tracking-widest">Ideas</span>
+    </NavLink>
+</nav>
+
+<style>
+    .nav-link {
+        cursor: pointer;
+    }
+    .nav-link:hover:not(.active) {
+        color: #FFD23F;
+        background-color: #201F1F;
+        border-radius: 0.75rem;
+    }
+</style>

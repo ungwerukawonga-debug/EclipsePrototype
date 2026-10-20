@@ -1,0 +1,69 @@
+@page "/jd/todays-plan"
+
+<div class="relative z-10 flex flex-col flex-grow">
+    <main class="flex-grow flex flex-col items-center justify-start px-6 py-8 mt-16 max-w-4xl mx-auto w-full">
+        <!-- Page Header -->
+        <div class="w-full text-center md:text-left mb-8">
+            <h2 class="font-headline font-black text-4xl text-on-background tracking-tighter leading-none">
+                Today's <span class="text-primary-container">Plan</span>
+            </h2>
+            <p class="text-on-surface-variant text-lg mt-2">Organize your daily objectives.</p>
+        </div>
+
+        <!-- Daily Tasks Section -->
+        <div class="w-full glass-effect border border-outline-variant/10 rounded-3xl p-6 mb-6">
+            <h3 class="text-on-surface font-headline font-bold text-xl mb-4">Your Tasks</h3>
+            <div class="flex flex-col gap-3">
+                @if (tasks.Any())
+                {
+                    @foreach (var task in tasks)
+                    {
+                        <div class="flex items-center gap-4 bg-surface-container-highest p-4 rounded-2xl">
+                            <input type="checkbox" @bind="task.IsComplete" class="form-checkbox h-5 w-5 text-primary-container rounded border-gray-300 focus:ring-primary-container" />
+                            <span class="font-body text-sm @(task.IsComplete ? "text-on-surface-variant line-through opacity-70" : "text-on-surface font-medium")">
+                                @task.Text
+                            </span>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <p class="text-on-surface-variant text-sm">No tasks for today. Add one below!</p>
+                }
+            </div>
+
+            <div class="mt-6 flex gap-3">
+                <input type="text" @bind="newTaskText" placeholder="Add a new task..." class="flex-grow bg-surface-container-highest border-none rounded-xl py-3 px-4 text-on-surface placeholder:text-outline/50 focus:ring-1 focus:ring-primary-fixed-dim transition-all outline-none" />
+                <button @onclick="AddTask" class="bg-primary-container hover:bg-primary-fixed-dim text-on-primary font-headline font-extrabold py-3 px-6 rounded-xl shadow-[0_4px_20px_rgba(255,210,63,0.3)] active:scale-[0.98] transition-all flex items-center justify-center gap-2">
+                    <span class="material-symbols-outlined text-xl">add</span>
+                </button>
+            </div>
+        </div>
+    </main>
+</div>
+
+@code {
+    private List<TodoTask> tasks = new List<TodoTask>
+    {
+        new TodoTask { Text = "Review Aether Horizon diagnostics", IsComplete = false },
+        new TodoTask { Text = "Synchronize neural pathways", IsComplete = true },
+        new TodoTask { Text = "Plan for Guardian creation", IsComplete = false }
+    };
+
+    private string newTaskText = "";
+
+    private void AddTask()
+    {
+        if (!string.IsNullOrWhiteSpace(newTaskText))
+        {
+            tasks.Add(new TodoTask { Text = newTaskText, IsComplete = false });
+            newTaskText = "";
+        }
+    }
+
+    public class TodoTask
+    {
+        public string Text { get; set; }
+        public bool IsComplete { get; set; }
+    }
+}

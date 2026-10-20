@@ -1,0 +1,118 @@
+@page "/registration"
+@layout AuthLayout
+
+<!-- Decorative Background Elements -->
+<div class="fixed top-0 left-0 w-full h-full pointer-events-none z-0 overflow-hidden">
+    <div class="absolute top-[10%] right-[-5%] w-[40vw] h-[40vw] rounded-full bg-primary-container/5 blur-[120px]"></div>
+    <div class="absolute bottom-[-10%] left-[-10%] w-[50vw] h-[50vw] rounded-full bg-tertiary-container/5 blur-[150px]"></div>
+    <!-- Abstract Grid Texture (Visual only) -->
+    <div class="absolute inset-0 opacity-[0.03]" style="background-image: radial-gradient(#FFD23F 0.5px, transparent 0.5px); background-size: 32px 32px;"></div>
+</div>
+
+<div class="relative z-10 flex flex-col flex-grow">
+    <header class="w-full flex justify-center items-center pt-12">
+        <h1 class="text-3xl font-black tracking-tighter text-primary-container text-glow font-headline">eQCLIPSE</h1>
+    </header>
+
+    <main class="flex-grow flex items-center justify-center px-6 py-12">
+        <div class="w-full max-w-md">
+            <!-- Hero Visual / Asymmetric Element -->
+            <div class="relative mb-12">
+                <div class="absolute -top-12 -left-8 w-32 h-32 bg-primary-container/10 rounded-full blur-3xl"></div>
+                <div class="relative z-10 text-center md:text-left">
+                    <p class="font-headline font-bold text-primary-container tracking-widest uppercase text-[10px] mb-2">Join eQCLIPSE</p>
+                    <h2 class="font-headline font-black text-4xl md:text-5xl text-on-background tracking-tighter leading-none mb-4">
+                        Create <span class="text-primary-container">Account</span>
+                    </h2>
+                </div>
+            </div>
+
+            <!-- Registration Form Card -->
+            <div class="glass-effect p-8 rounded-xl neon-glow border border-outline-variant/10">
+                <form class="space-y-6">
+                    <!-- Email Input Group -->
+                    <div class="space-y-2">
+                        <label class="block text-[10px] font-bold uppercase tracking-[0.2em] text-on-surface-variant px-1">Email Address</label>
+                        <div class="relative group">
+                            <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline text-sm">mail</span>
+                            <input @bind="Email" class="w-full bg-surface-container-highest border-none rounded-xl py-4 pl-12 pr-4 text-on-surface placeholder:text-outline/50 focus:ring-1 focus:ring-primary-fixed-dim transition-all outline-none" placeholder="your@email.com" type="email" />
+                        </div>
+                    </div>
+
+                    <!-- Password Input Group -->
+                    <div class="space-y-2">
+                        <label class="block text-[10px] font-bold uppercase tracking-[0.2em] text-on-surface-variant px-1">Password</label>
+                        <div class="relative group">
+                            <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline text-sm">lock</span>
+                            <input @bind="Password" class="w-full bg-surface-container-highest border-none rounded-xl py-4 pl-12 pr-4 text-on-surface placeholder:text-outline/50 focus:ring-1 focus:ring-primary-fixed-dim transition-all outline-none" placeholder="••••••••" type="password" />
+                            <span class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-outline text-sm cursor-pointer hover:text-primary-container transition-colors">visibility</span>
+                        </div>
+                    </div>
+
+                    <!-- Confirm Password Input Group -->
+                    <div class="space-y-2">
+                        <label class="block text-[10px] font-bold uppercase tracking-[0.2em] text-on-surface-variant px-1">Confirm Password</label>
+                        <div class="relative group">
+                            <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline text-sm">lock</span>
+                            <input @bind="ConfirmPassword" class="w-full bg-surface-container-highest border-none rounded-xl py-4 pl-12 pr-4 text-on-surface placeholder:text-outline/50 focus:ring-1 focus:ring-primary-fixed-dim transition-all outline-none" placeholder="••••••••" type="password" />
+                            <span class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-outline text-sm cursor-pointer hover:text-primary-container transition-colors">visibility</span>
+                        </div>
+                    </div>
+
+                    <!-- Primary Action -->
+                    <div class="pt-4">
+                        <button class="w-full bg-primary-container hover:bg-primary-fixed-dim text-on-primary font-headline font-extrabold py-4 rounded-xl shadow-[0_4px_20px_rgba(255,210,63,0.3)] active:scale-[0.98] transition-all flex items-center justify-center gap-2 disabled:opacity-50" type="button" @onclick="HandleRegistration" disabled="@isLoading">
+                            @if(isLoading) {
+                                <span class="material-symbols-outlined text-xl animate-spin">sync</span>
+                                <span>Creating Account...</span>
+                            } else {
+                                <span>Register</span>
+                                <span class="material-symbols-outlined text-xl">person_add</span>
+                            }
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Secondary Action -->
+            <div class="mt-12 text-center">
+                <p class="text-on-surface-variant text-sm font-medium">
+                    Already have an account? 
+                    <a class="text-primary-container font-bold ml-1 hover:underline underline-offset-4 decoration-primary-container/30" href="/">Login</a>
+                </p>
+            </div>
+        </div>
+    </main>
+
+    <!-- Visual Footer Accent -->
+    <footer class="py-8 flex flex-col items-center gap-2 opacity-30 mt-auto">
+        <div class="flex gap-8 mb-4">
+            <span class="material-symbols-outlined text-primary-container text-xs">adjust</span>
+            <span class="material-symbols-outlined text-primary-container text-xs">adjust</span>
+            <span class="material-symbols-outlined text-primary-container text-xs">adjust</span>
+        </div>
+        <p class="text-[10px] font-bold uppercase tracking-[0.3em] text-on-surface">eQCLIPSE · Connect with care</p>
+    </footer>
+</div>
+
+@code {
+    [Inject]
+    private NavigationManager Navigation { get; set; } = default!;
+
+    private string Email = "";
+    private string Password = "";
+    private string ConfirmPassword = "";
+    private bool isLoading = false;
+
+    private async Task HandleRegistration()
+    {
+        isLoading = true;
+        StateHasChanged();
+
+        // Simulate registration process
+        await Task.Delay(1500); 
+
+        // For now, just navigate to Aether Horizon after simulated registration
+        Navigation.NavigateTo("aether-horizon");
+    }
+}

@@ -1,0 +1,69 @@
+@page "/jd/steps-to-reach-goals"
+
+<div class="relative z-10 flex flex-col flex-grow">
+    <main class="flex-grow flex flex-col items-center justify-start px-6 py-8 mt-16 max-w-4xl mx-auto w-full">
+        <!-- Page Header -->
+        <div class="w-full text-center md:text-left mb-8">
+            <h2 class="font-headline font-black text-4xl text-on-background tracking-tighter leading-none">
+                Steps to <span class="text-primary-container">Reach Goals</span>
+            </h2>
+            <p class="text-on-surface-variant text-lg mt-2">Break down your ambitions into actionable steps.</p>
+        </div>
+
+        <!-- Steps List Section -->
+        <div class="w-full glass-effect border border-outline-variant/10 rounded-3xl p-6 mb-6">
+            <h3 class="text-on-surface font-headline font-bold text-xl mb-4">My Action Plan</h3>
+            <div class="flex flex-col gap-3">
+                @if (steps.Any())
+                {
+                    @foreach (var step in steps)
+                    {
+                        <div class="flex items-center gap-4 bg-surface-container-highest p-4 rounded-2xl">
+                            <input type="checkbox" @bind="step.IsComplete" class="form-checkbox h-5 w-5 text-primary-container rounded border-gray-300 focus:ring-primary-container" />
+                            <span class="font-body text-sm @(step.IsComplete ? "text-on-surface-variant line-through opacity-70" : "text-on-surface font-medium")">
+                                @step.Text
+                            </span>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <p class="text-on-surface-variant text-sm">No steps defined yet. Start planning!</p>
+                }
+            </div>
+
+            <div class="mt-6 flex gap-3">
+                <input type="text" @bind="newStepText" placeholder="Add a new step..." class="flex-grow bg-surface-container-highest border-none rounded-xl py-3 px-4 text-on-surface placeholder:text-outline/50 focus:ring-1 focus:ring-primary-fixed-dim transition-all outline-none" />
+                <button @onclick="AddStep" class="bg-primary-container hover:bg-primary-fixed-dim text-on-primary font-headline font-extrabold py-3 px-6 rounded-xl shadow-[0_4px_20px_rgba(255,210,63,0.3)] active:scale-[0.98] transition-all flex items-center justify-center gap-2">
+                    <span class="material-symbols-outlined text-xl">add</span>
+                </button>
+            </div>
+        </div>
+    </main>
+</div>
+
+@code {
+    private List<GoalStep> steps = new List<GoalStep>
+    {
+        new GoalStep { Text = "Research Aetheric energy sources", IsComplete = false },
+        new GoalStep { Text = "Train in basic neural synchronization", IsComplete = true },
+        new GoalStep { Text = "Consult with Elder Guardians", IsComplete = false }
+    };
+
+    private string newStepText = "";
+
+    private void AddStep()
+    {
+        if (!string.IsNullOrWhiteSpace(newStepText))
+        {
+            steps.Add(new GoalStep { Text = newStepText, IsComplete = false });
+            newStepText = "";
+        }
+    }
+
+    public class GoalStep
+    {
+        public string Text { get; set; }
+        public bool IsComplete { get; set; }
+    }
+}

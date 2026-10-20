@@ -1,0 +1,14 @@
+@inherits LayoutComponentBase
+
+<div class="flex flex-col min-h-screen bg-surface text-on-surface font-body selection:bg-primary-container selection:text-on-primary">
+    <!-- Desktop/Tablet Header Wrapper -->
+    <TopAppBar />
+
+    <!-- Main Content Area -->
+    <main class="flex-grow pb-24 relative z-10 w-full relative">
+        @Body
+    </main>
+
+    <!-- Bottom Navigation Component -->
+    <BottomNavbar />
+</div>

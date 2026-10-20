@@ -1,0 +1,526 @@
+@page "/chat"
+@layout AuthLayout
+
+<style>
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    
+    /* Connection line for nested comments */
+    .thread-line {
+        position: relative;
+    }
+    .thread-line::before {
+        content: '';
+        position: absolute;
+        left: -18px;
+        top: -12px;
+        bottom: 24px;
+        width: 2px;
+        background: rgba(77, 70, 52, 0.25);
+        border-radius: 4px;
+    }
+    .thread-line::after {
+        content: '';
+        position: absolute;
+        left: -18px;
+        top: 20px;
+        width: 14px;
+        height: 2px;
+        background: rgba(77, 70, 52, 0.25);
+    }
+</style>
+
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 flex justify-between items-center px-6 h-16 bg-[#2A2A2A] border-b border-outline-variant/10 shadow-md">
+    <div class="flex items-center gap-4">
+        <button class="hover:bg-[#353534] transition-colors p-2 rounded-full active:scale-95 duration-150" @onclick="NavigateBack">
+            <span class="material-symbols-outlined text-[#E5E2E1]">arrow_back</span>
+        </button>
+        <div class="flex items-center gap-3">
+            <div class="relative">
+                <img alt="Contact Avatar" class="w-10 h-10 rounded-xl object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCHO2ix-EW9vEWMwGC57wDxQwP2n_3Ff2lVH5HGUZ-tXfaVKEqiGzmDAjH2qiAwWv0j1ij1G1BdKw32ploS1r2onqxJ10M8F325tYLgFv3qQ2d2uQMGj7XbZNEyXAnzme4AizMCiz4zMtC5FFcG_HVviddCb2PqpjcHGXtkTBxvLX_T3n5VOO6MqdjV1dzGgMczb8lckoRAxlg-QzBRtx6nPDugywegiOFFxok_pqDokix96LRUJROkBUOYuop7PWdk5yP5RrqfWUA"/>
+                <span class="absolute bottom-0 right-0 w-3 h-3 bg-emerald-500 rounded-full border-2 border-surface"></span>
+            </div>
+            <div>
+                <h1 class="font-headline font-black tracking-tighter text-[#FFD23F] drop-shadow-[0_0_10px_rgba(255,210,63,0.3)] text-lg leading-none">Maya Chen</h1>
+                <span class="font-label text-xs text-[#E5E2E1]/60 uppercase tracking-widest">Online · 🔋 85%</span>
+            </div>
+        </div>
+    </div>
+    <div class="flex items-center gap-1">
+        <button class="hover:bg-[#353534] transition-colors p-2 rounded-full active:scale-95 duration-150">
+            <span class="material-symbols-outlined text-[#FFD23F]">forum</span>
+        </button>
+        <button class="hover:bg-[#353534] transition-colors p-2 rounded-full active:scale-95 duration-150">
+            <span class="material-symbols-outlined text-[#E5E2E1]">tune</span>
+        </button>
+    </div>
+</header>
+
+<!-- Chat Messages -->
+<main class="pt-20 pb-36 px-4 md:px-8 max-w-4xl mx-auto flex-grow flex flex-col gap-8 no-scrollbar h-full w-full">
+    <div class="flex justify-center my-2">
+        <span class="bg-surface-container-high px-4 py-1.5 rounded-full text-[10px] font-label text-on-surface-variant uppercase tracking-[0.2em] border border-outline-variant/10 shadow-[0_4px_10px_rgba(0,0,0,0.2)]">Today</span>
+    </div>
+
+    @foreach(var msg in chatMessages)
+    {
+        <!-- Thought Card Block -->
+        <div class="flex flex-col gap-2 w-full glass-panel rounded-3xl p-5 border border-outline-variant/15 relative overflow-hidden transition-all duration-300 hover:border-outline-variant/30 @(msg.IsSent ? "shadow-[0_4px_20px_rgba(255,210,63,0.05)] border-l-4 border-l-primary-container" : "shadow-[0_4px_20px_rgba(0,219,236,0.03)] border-l-4 border-l-tertiary-container")">
+            
+            <!-- Glow background matched to author -->
+            <div class="absolute top-0 right-0 w-24 h-24 blur-[40px] pointer-events-none rounded-full @(msg.IsSent ? "bg-primary-container/10" : "bg-tertiary-container/5")"></div>
+            
+            <!-- Card Header (Author Info & Actions) -->
+            <div class="flex items-center justify-between mb-2">
+                <div class="flex items-center gap-3">
+                    <img alt="Avatar" class="w-8 h-8 rounded-lg object-cover border border-outline-variant/20 shadow-md" src="@msg.Avatar" />
+                    <div>
+                        <h4 class="font-headline font-bold text-sm @(msg.IsSent ? "text-[#FFD23F]" : "text-on-surface") flex items-center gap-1.5">
+                            @msg.Author
+                            @if(msg.IsSent)
+                            {
+                                <span class="bg-primary-container/20 border border-primary-container/30 text-primary-container px-1.5 py-0.5 rounded text-[8px] font-label font-bold uppercase tracking-wider scale-90">You</span>
+                            }
+                            else
+                            {
+                                <span class="bg-tertiary-container/10 border border-tertiary-container/30 text-tertiary-container px-1.5 py-0.5 rounded text-[8px] font-label font-bold uppercase tracking-wider scale-90">Friend</span>
+                            }
+                        </h4>
+                        <span class="text-[9px] font-label text-outline/60 uppercase tracking-widest">@msg.Time</span>
+                    </div>
+                </div>
+                
+                <span class="material-symbols-outlined text-outline/40 text-base cursor-default select-none">share_reviews</span>
+            </div>
+
+            <!-- Card Body / Content -->
+            <div class="flex flex-col gap-3 pl-11 pr-2">
+                @if(!string.IsNullOrEmpty(msg.ImageAttachment))
+                {
+                    <div class="relative rounded-2xl overflow-hidden border border-outline-variant/20 shadow-lg group">
+                        <img alt="Attachment" class="w-full max-h-[300px] object-cover group-hover:scale-102 transition-transform duration-700" src="@msg.ImageAttachment"/>
+                        <div class="absolute bottom-3 left-3 bg-[#131313]/70 backdrop-blur-md px-3 py-1 rounded-xl border border-outline-variant/30 flex items-center gap-1.5 shadow-[0_4px_10px_rgba(0,0,0,0.4)]">
+                            <span class="material-symbols-outlined text-primary-container text-sm">location_on</span>
+                            <span class="text-[10px] font-label text-white uppercase tracking-wider">Central Park, NYC</span>
+                        </div>
+                    </div>
+                }
+                
+                <p class="text-on-surface text-sm font-body leading-relaxed text-glow">@msg.Text</p>
+            </div>
+
+            <!-- Card Reactions Summary -->
+            @if (msg.Reactions.Any(r => r.Count > 0))
+            {
+                <div class="flex flex-wrap items-center gap-1.5 pl-11 mt-2">
+                    @foreach (var react in msg.Reactions.Where(r => r.Count > 0))
+                    {
+                        <button @onclick="() => ToggleReaction(msg, react.Emoji)"
+                                class="flex items-center gap-1.5 px-2 py-0.5 rounded-full border text-[10px] font-bold font-label transition-all active:scale-95 @(react.UserReacted ? "bg-primary-container/20 border-primary-container text-primary-container shadow-[0_0_8px_rgba(255,210,63,0.1)]" : "bg-surface-container-low border-outline-variant/15 text-outline/80 hover:border-outline-variant/40")">
+                            <span>@react.Emoji</span>
+                            <span>@react.Count</span>
+                        </button>
+                    }
+                </div>
+            }
+
+            <!-- Card Footer Toolbar -->
+            <div class="flex items-center gap-2 border-t border-outline-variant/10 mt-3 pt-3 pl-11 text-xs">
+                <!-- React Trigger Button -->
+                <div class="relative">
+                    <button @onclick="() => msg.ShowReactionsPanel = !msg.ShowReactionsPanel"
+                            class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl hover:bg-surface-container transition-colors text-outline hover:text-primary-container active:scale-95 duration-100">
+                        <span class="material-symbols-outlined text-sm">mood</span>
+                        <span class="font-label font-bold uppercase tracking-wider text-[9px]">React</span>
+                    </button>
+
+                    <!-- HOVERING EMOJI REACTIONS OVERLAY -->
+                    @if (msg.ShowReactionsPanel)
+                    {
+                        <div class="absolute bottom-10 left-0 z-40 bg-surface-container-high border border-outline-variant/30 rounded-full px-3 py-1.5 flex items-center gap-2 shadow-[0_10px_25px_rgba(0,0,0,0.5)] shadow-black/80 animate-fade-in-up">
+                            @foreach (var emoji in AvailableEmojis)
+                            {
+                                <button @onclick="() => AddEmojiReaction(msg, emoji)" 
+                                        class="hover:scale-130 transition-transform active:scale-90 text-lg">
+                                    @emoji
+                                </button>
+                            }
+                        </div>
+                    }
+                </div>
+
+                <!-- Resonate/Comment Toggle -->
+                <button @onclick="() => ToggleComments(msg)"
+                        class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl hover:bg-surface-container transition-colors text-outline hover:text-tertiary-container active:scale-95 duration-100">
+                    <span class="material-symbols-outlined text-sm">chat_bubble</span>
+                    <span class="font-label font-bold uppercase tracking-wider text-[9px]">
+                        Reply (@msg.Comments.Count)
+                    </span>
+                </button>
+
+                <button @onclick="() => CopyResonanceLink(msg)"
+                        class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl hover:bg-surface-container transition-colors text-outline hover:text-white active:scale-95 duration-100">
+                    <span class="material-symbols-outlined text-sm">content_copy</span>
+                    <span class="font-label font-bold uppercase tracking-wider text-[9px]">Copy</span>
+                </button>
+            </div>
+
+            <!-- Threaded Comments / Dialogue Section -->
+            @if (msg.ShowCommentsPanel && msg.Comments.Any())
+            {
+                <div class="flex flex-col gap-3 pl-16 pr-2 mt-4 pt-3 border-t border-outline-variant/5">
+                    @foreach (var comment in msg.Comments)
+                    {
+                        <div class="flex gap-3 thread-line group/comment">
+                            <img alt="Commentor Avatar" class="w-6 h-6 rounded-md object-cover mt-0.5 border border-outline-variant/10 shadow" src="@comment.Avatar"/>
+                            <div class="flex-1 bg-surface-container-low border border-outline-variant/10 p-3 rounded-xl">
+                                <div class="flex justify-between items-baseline mb-1">
+                                    <h5 class="font-headline font-bold text-xs text-on-surface">@comment.Author</h5>
+                                    <span class="text-[8px] font-label text-outline/50 uppercase tracking-widest">@comment.Time</span>
+                                </div>
+                                <p class="text-on-surface-variant font-body text-xs leading-relaxed">@comment.Text</p>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+
+            <!-- Inline Thread Commenting Box -->
+            @if (msg.ShowCommentsPanel)
+            {
+                <div class="pl-16 pr-2 mt-3 flex gap-3 items-center">
+                    <img alt="Your Avatar" class="w-6 h-6 rounded-md object-cover border border-outline-variant/15 shadow" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBaKv2ynSrU_e8VTjjOHTm7JJECEkWX04ack4ppeG--CvVyP68vFnQlbMpmefGehlXhgmC0a13Ad8GLJ5S5IvL0W6bh7MhBbSIE6Ad6ushR6rBavD18UXBP6f9V8ewzmTtjA3Wox48fDKnLXyb4xImq1op45hcwsFq4z41JCfdNNNZVViUkJPkWSPGKOcZ98iolypuVZEaLD-GfUpX4HpW6Ydgnj0W0UDQ3VgXOgOVnB9jTM0LXnTYVwgK9AKjp3jMkX0DUWn6eGC0"/>
+                    <div class="flex-1 relative flex items-center">
+                        <input @bind="msg.NewCommentText" placeholder="Write a reply..." @onkeyup="(e) => HandleCommentKeyUp(e, msg)" class="w-full bg-[#1c1b1b] text-on-surface text-xs placeholder:text-outline/40 border border-outline-variant/15 rounded-xl py-2 pl-4 pr-10 outline-none focus:ring-1 focus:ring-primary-container/30 focus:border-primary-container/30 transition-all font-body"/>
+                        <button @onclick="() => AddComment(msg)" class="absolute right-2 text-primary-container hover:text-primary-fixed-dim transition-colors">
+                            <span class="material-symbols-outlined text-base">send</span>
+                        </button>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+
+    <!-- Typing Indicator -->
+    @if(isTyping) {
+        <div class="flex items-center gap-3 ml-4 bg-[#2A2A2A]/40 border border-outline-variant/10 px-4 py-2 rounded-full self-start shadow-md backdrop-blur-md">
+            <div class="flex gap-1.5">
+                <span class="w-2 h-2 bg-primary-container/40 rounded-full animate-bounce" style="animation-delay: 0s;"></span>
+                <span class="w-2 h-2 bg-primary-container/60 rounded-full animate-bounce" style="animation-delay: 0.2s;"></span>
+                <span class="w-2 h-2 bg-primary-container/80 rounded-full animate-bounce" style="animation-delay: 0.4s;"></span>
+            </div>
+            <span class="text-[9px] font-label text-on-surface-variant uppercase tracking-[0.15em] font-semibold">Maya is typing...</span>
+        </div>
+    }
+</main>
+
+<!-- Unified Bottom Broadcast Input Bar -->
+<footer class="fixed bottom-0 left-0 w-full z-40 px-4 pb-8 pt-4 bg-[#131313]/90 backdrop-blur-xl border-t border-[#4D4634]/20">
+    <div class="max-w-4xl mx-auto flex items-center gap-3">
+        <button class="flex items-center justify-center text-[#E5E2E1]/60 w-10 h-10 hover:text-[#FFD23F] transition-all active:scale-90" @onclick="SimulateAttachment">
+            <span class="material-symbols-outlined">add_circle</span>
+        </button>
+        <div class="flex-1 relative">
+            <input @bind="newMessageText" @bind:event="oninput" @onkeyup="HandleKeyUp" class="w-full bg-[#353534] text-on-surface placeholder:text-on-surface-variant/50 border-none rounded-2xl py-3 px-5 focus:ring-1 focus:ring-primary-container/50 font-body text-sm outline-none shadow-inner" placeholder="Type a message..." type="text" />
+            <div class="absolute right-3 top-1/2 -translate-y-1/2 flex gap-2">
+                <button class="text-on-surface-variant/60 hover:text-primary-container transition-colors" @onclick="ToggleActiveTyping">
+                    <span class="material-symbols-outlined text-xl">sensors</span>
+                </button>
+            </div>
+        </div>
+        <button class="bg-[#FFD23F] text-[#3D2F00] w-12 h-12 rounded-xl flex items-center justify-center shadow-[0_0_15px_rgba(255,210,63,0.3)] active:scale-90 duration-200 group" @onclick="SendMessage">
+            <span class="material-symbols-outlined group-hover:translate-x-0.5 transition-transform" style="font-variation-settings: 'FILL' 1;">send</span>
+        </button>
+    </div>
+</footer>
+
+@code {
+    [Inject]
+    private NavigationManager Navigation { get; set; } = default!;
+
+    public class ReactionItem {
+        public string Emoji { get; set; } = "";
+        public int Count { get; set; } = 0;
+        public bool UserReacted { get; set; } = false;
+    }
+
+    public class CommentItem {
+        public string Author { get; set; } = "";
+        public string Avatar { get; set; } = "";
+        public string Text { get; set; } = "";
+        public string Time { get; set; } = "";
+    }
+
+    public class ChatMsg {
+        public int Id { get; set; }
+        public string Author { get; set; } = "";
+        public string Avatar { get; set; } = "";
+        public string Text { get; set; } = "";
+        public string Time { get; set; } = "";
+        public bool IsSent { get; set; } = false;
+        public string ImageAttachment { get; set; } = "";
+        public List<ReactionItem> Reactions { get; set; } = new();
+        public List<CommentItem> Comments { get; set; } = new();
+        
+        // UI states
+        public bool ShowReactionsPanel { get; set; } = false;
+        public bool ShowCommentsPanel { get; set; } = true;
+        public string NewCommentText { get; set; } = "";
+    }
+
+    private List<string> AvailableEmojis = new() { "👍", "❤️", "🔋", "✨", "🧠" };
+
+    private List<ChatMsg> chatMessages = new();
+    private string newMessageText = "";
+    private bool isTyping = false;
+    private int nextMessageId = 1;
+
+    protected override void OnInitialized()
+    {
+        // Hydrate feed messages with detailed initial comments and reactions
+        chatMessages = new() {
+            new ChatMsg { 
+                Id = nextMessageId++,
+                Author = "Maya Chen",
+                Avatar = "https://lh3.googleusercontent.com/aida-public/AB6AXuCHO2ix-EW9vEWMwGC57wDxQwP2n_3Ff2lVH5HGUZ-tXfaVKEqiGzmDAjH2qiAwWv0j1ij1G1BdKw32ploS1r2onqxJ10M8F325tYLgFv3qQ2d2uQMGj7XbZNEyXAnzme4AizMCiz4zMtC5FFcG_HVviddCb2PqpjcHGXtkTBxvLX_T3n5VOO6MqdjV1dzGgMczb8lckoRAxlg-QzBRtx6nPDugywegiOFFxok_pqDokix96LRUJROkBUOYuop7PWdk5yP5RrqfWUA",
+                Text = "Hey! I saw your social battery was at 40% yesterday. How are you feeling today?", 
+                Time = "09:42 AM", 
+                IsSent = false,
+                Reactions = new() {
+                    new ReactionItem { Emoji = "❤️", Count = 1, UserReacted = false },
+                    new ReactionItem { Emoji = "🔋", Count = 1, UserReacted = false }
+                },
+                Comments = new() {
+                    new CommentItem { Author = "Alex Morgan (You)", Avatar = "https://lh3.googleusercontent.com/aida-public/AB6AXuBaKv2ynSrU_e8VTjjOHTm7JJECEkWX04ack4ppeG--CvVyP68vFnQlbMpmefGehlXhgmC0a13Ad8GLJ5S5IvL0W6bh7MhBbSIE6Ad6ushR6rBavD18UXBP6f9V8ewzmTtjA3Wox48fDKnLXyb4xImq1op45hcwsFq4z41JCfdNNNZVViUkJPkWSPGKOcZ98iolypuVZEaLD-GfUpX4HpW6Ydgnj0W0UDQ3VgXOgOVnB9jTM0LXnTYVwgK9AKjp3jMkX0DUWn6eGC0", Text = "A bit better — got some rest last night.", Time = "09:43 AM" }
+                }
+            },
+            new ChatMsg { 
+                Id = nextMessageId++,
+                Author = "Alex Morgan (You)",
+                Avatar = "https://lh3.googleusercontent.com/aida-public/AB6AXuBaKv2ynSrU_e8VTjjOHTm7JJECEkWX04ack4ppeG--CvVyP68vFnQlbMpmefGehlXhgmC0a13Ad8GLJ5S5IvL0W6bh7MhBbSIE6Ad6ushR6rBavD18UXBP6f9V8ewzmTtjA3Wox48fDKnLXyb4xImq1op45hcwsFq4z41JCfdNNNZVViUkJPkWSPGKOcZ98iolypuVZEaLD-GfUpX4HpW6Ydgnj0W0UDQ3VgXOgOVnB9jTM0LXnTYVwgK9AKjp3jMkX0DUWn6eGC0",
+                Text = "Work was draining though. Back-to-back meetings all day.", 
+                Time = "09:44 AM", 
+                IsSent = true,
+                Reactions = new() {
+                    new ReactionItem { Emoji = "👍", Count = 1, UserReacted = true }
+                }
+            },
+            new ChatMsg { 
+                Id = nextMessageId++,
+                Author = "Maya Chen",
+                Avatar = "https://lh3.googleusercontent.com/aida-public/AB6AXuCHO2ix-EW9vEWMwGC57wDxQwP2n_3Ff2lVH5HGUZ-tXfaVKEqiGzmDAjH2qiAwWv0j1ij1G1BdKw32ploS1r2onqxJ10M8F325tYLgFv3qQ2d2uQMGj7XbZNEyXAnzme4AizMCiz4zMtC5FFcG_HVviddCb2PqpjcHGXtkTBxvLX_T3n5VOO6MqdjV1dzGgMczb8lckoRAxlg-QzBRtx6nPDugywegiOFFxok_pqDokix96LRUJROkBUOYuop7PWdk5yP5RrqfWUA",
+                Text = "That makes sense. I took a walk during lunch — it helped a lot. Sending you this view 🌿", 
+                Time = "09:45 AM", 
+                IsSent = false,
+                ImageAttachment = "https://lh3.googleusercontent.com/aida-public/AB6AXuAiu1FnioRLvjLFoI6uTPIOx9Vs52HvLE4qanN4y1m9XKFKfPTBZrQNiUMh5I3mduptZfWi5qJ7N7Z9fcALlw_TnQ0Rj6ZbVLilgMvnABwOyCv7-v876e5CJpTYpBD2ePTPUUuxGUmzzIb7c1YNUmjsI928e_WcxSsVtbXmwhs_YTIPFcgpSSsf5SDGVvqFAIsk3D1j7CJMNx6LvuZ9r4a3JhVHhYczojzVIOPRF-vcNJPSUlvWBGNFwJlDCfraJJpuVoXbIW51aY8",
+                Reactions = new() {
+                    new ReactionItem { Emoji = "❤️", Count = 2, UserReacted = false }
+                },
+                Comments = new() {
+                    new CommentItem { Author = "Alex Morgan (You)", Avatar = "https://lh3.googleusercontent.com/aida-public/AB6AXuBaKv2ynSrU_e8VTjjOHTm7JJECEkWX04ack4ppeG--CvVyP68vFnQlbMpmefGehlXhgmC0a13Ad8GLJ5S5IvL0W6bh7MhBbSIE6Ad6ushR6rBavD18UXBP6f9V8ewzmTtjA3Wox48fDKnLXyb4xImq1op45hcwsFq4z41JCfdNNNZVViUkJPkWSPGKOcZ98iolypuVZEaLD-GfUpX4HpW6Ydgnj0W0UDQ3VgXOgOVnB9jTM0LXnTYVwgK9AKjp3jMkX0DUWn6eGC0", Text = "That's beautiful. I should try that tomorrow.", Time = "09:46 AM" }
+                }
+            },
+            new ChatMsg { 
+                Id = nextMessageId++,
+                Author = "Maya Chen",
+                Avatar = "https://lh3.googleusercontent.com/aida-public/AB6AXuCHO2ix-EW9vEWMwGC57wDxQwP2n_3Ff2lVH5HGUZ-tXfaVKEqiGzmDAjH2qiAwWv0j1ij1G1BdKw32ploS1r2onqxJ10M8F325tYLgFv3qQ2d2uQMGj7XbZNEyXAnzme4AizMCiz4zMtC5FFcG_HVviddCb2PqpjcHGXtkTBxvLX_T3n5VOO6MqdjV1dzGgMczb8lckoRAxlg-QzBRtx6nPDugywegiOFFxok_pqDokix96LRUJROkBUOYuop7PWdk5yP5RrqfWUA",
+                Text = "That sounds like a lot. Want to talk through it tonight?", 
+                Time = "09:47 AM", 
+                IsSent = false,
+                Reactions = new() {
+                    new ReactionItem { Emoji = "👍", Count = 1, UserReacted = false }
+                }
+            },
+            new ChatMsg { 
+                Id = nextMessageId++,
+                Author = "Alex Morgan (You)",
+                Avatar = "https://lh3.googleusercontent.com/aida-public/AB6AXuBaKv2ynSrU_e8VTjjOHTm7JJECEkWX04ack4ppeG--CvVyP68vFnQlbMpmefGehlXhgmC0a13Ad8GLJ5S5IvL0W6bh7MhBbSIE6Ad6ushR6rBavD18UXBP6f9V8ewzmTtjA3Wox48fDKnLXyb4xImq1op45hcwsFq4z41JCfdNNNZVViUkJPkWSPGKOcZ98iolypuVZEaLD-GfUpX4HpW6Ydgnj0W0UDQ3VgXOgOVnB9jTM0LXnTYVwgK9AKjp3jMkX0DUWn6eGC0",
+                Text = "Yeah, that would really help. I'll update my battery to 75% — feeling more open to chat.", 
+                Time = "09:48 AM", 
+                IsSent = true,
+                Reactions = new() {
+                    new ReactionItem { Emoji = "❤️", Count = 1, UserReacted = true }
+                }
+            }
+        };
+    }
+
+    private void ToggleComments(ChatMsg msg)
+    {
+        msg.ShowCommentsPanel = !msg.ShowCommentsPanel;
+    }
+
+    private void AddEmojiReaction(ChatMsg msg, string emoji)
+    {
+        msg.ShowReactionsPanel = false;
+        var existing = msg.Reactions.FirstOrDefault(r => r.Emoji == emoji);
+        
+        if (existing != null)
+        {
+            if (existing.UserReacted)
+            {
+                existing.Count--;
+                existing.UserReacted = false;
+            }
+            else
+            {
+                existing.Count++;
+                existing.UserReacted = true;
+            }
+        }
+        else
+        {
+            msg.Reactions.Add(new ReactionItem {
+                Emoji = emoji,
+                Count = 1,
+                UserReacted = true
+            });
+        }
+    }
+
+    private void ToggleReaction(ChatMsg msg, string emoji)
+    {
+        var existing = msg.Reactions.FirstOrDefault(r => r.Emoji == emoji);
+        if (existing != null)
+        {
+            if (existing.UserReacted)
+            {
+                existing.Count--;
+                existing.UserReacted = false;
+            }
+            else
+            {
+                existing.Count++;
+                existing.UserReacted = true;
+            }
+        }
+    }
+
+    private void CopyResonanceLink(ChatMsg msg)
+    {
+        // Simulated clipboard resonance sync
+        msg.Reactions.Add(new ReactionItem { Emoji = "🔋", Count = 1, UserReacted = true });
+        StateHasChanged();
+    }
+
+    private void AddComment(ChatMsg msg)
+    {
+        if (string.IsNullOrWhiteSpace(msg.NewCommentText)) return;
+
+        msg.Comments.Add(new CommentItem {
+            Author = "Alex Morgan (You)",
+            Avatar = "https://lh3.googleusercontent.com/aida-public/AB6AXuBaKv2ynSrU_e8VTjjOHTm7JJECEkWX04ack4ppeG--CvVyP68vFnQlbMpmefGehlXhgmC0a13Ad8GLJ5S5IvL0W6bh7MhBbSIE6Ad6ushR6rBavD18UXBP6f9V8ewzmTtjA3Wox48fDKnLXyb4xImq1op45hcwsFq4z41JCfdNNNZVViUkJPkWSPGKOcZ98iolypuVZEaLD-GfUpX4HpW6Ydgnj0W0UDQ3VgXOgOVnB9jTM0LXnTYVwgK9AKjp3jMkX0DUWn6eGC0",
+            Text = msg.NewCommentText,
+            Time = "Just now"
+        });
+
+        msg.NewCommentText = "";
+        StateHasChanged();
+
+        // Simulated pilot reaction to your comment
+        _ = SimulateCommentReaction(msg);
+    }
+
+    private async Task SimulateCommentReaction(ChatMsg msg)
+    {
+        await Task.Delay(1000);
+        msg.Reactions.Add(new ReactionItem { Emoji = "✨", Count = 1, UserReacted = false });
+        StateHasChanged();
+    }
+
+    private void HandleCommentKeyUp(KeyboardEventArgs e, ChatMsg msg)
+    {
+        if (e.Key == "Enter")
+        {
+            AddComment(msg);
+        }
+    }
+
+    private void SendMessage()
+    {
+        if (string.IsNullOrWhiteSpace(newMessageText)) return;
+
+        var userMsg = new ChatMsg {
+            Id = nextMessageId++,
+            Author = "Alex Morgan (You)",
+            Avatar = "https://lh3.googleusercontent.com/aida-public/AB6AXuBaKv2ynSrU_e8VTjjOHTm7JJECEkWX04ack4ppeG--CvVyP68vFnQlbMpmefGehlXhgmC0a13Ad8GLJ5S5IvL0W6bh7MhBbSIE6Ad6ushR6rBavD18UXBP6f9V8ewzmTtjA3Wox48fDKnLXyb4xImq1op45hcwsFq4z41JCfdNNNZVViUkJPkWSPGKOcZ98iolypuVZEaLD-GfUpX4HpW6Ydgnj0W0UDQ3VgXOgOVnB9jTM0LXnTYVwgK9AKjp3jMkX0DUWn6eGC0",
+            Text = newMessageText,
+            Time = DateTime.Now.ToString("hh:mm tt"),
+            IsSent = true,
+            Reactions = new(),
+            Comments = new()
+        };
+
+        chatMessages.Add(userMsg);
+        newMessageText = "";
+        StateHasChanged();
+        
+        // Mock a reply scenario automatically.
+        if(!isTyping) {
+           _ = SimulateReply(userMsg); 
+        }
+    }
+
+    private async Task SimulateReply(ChatMsg lastUserMsg)
+    {
+        isTyping = true;
+        StateHasChanged();
+        await Task.Delay(2500); // Wait to simulate thinking
+        isTyping = false;
+        
+        // Voss comments directly under your posted thought card, reflecting community-driven feed!
+        lastUserMsg.Comments.Add(new CommentItem {
+            Author = "Maya Chen",
+            Avatar = "https://lh3.googleusercontent.com/aida-public/AB6AXuCHO2ix-EW9vEWMwGC57wDxQwP2n_3Ff2lVH5HGUZ-tXfaVKEqiGzmDAjH2qiAwWv0j1ij1G1BdKw32ploS1r2onqxJ10M8F325tYLgFv3qQ2d2uQMGj7XbZNEyXAnzme4AizMCiz4zMtC5FFcG_HVviddCb2PqpjcHGXtkTBxvLX_T3n5VOO6MqdjV1dzGgMczb8lckoRAxlg-QzBRtx6nPDugywegiOFFxok_pqDokix96LRUJROkBUOYuop7PWdk5yP5RrqfWUA",
+            Text = "I'm glad you're feeling a bit better. Let's catch up tonight — no pressure, just whenever you're ready.",
+            Time = DateTime.Now.ToString("hh:mm tt")
+        });
+        
+        // Voss also adds an emoji reaction to the main card
+        lastUserMsg.Reactions.Add(new ReactionItem {
+            Emoji = "✨",
+            Count = 1,
+            UserReacted = false
+        });
+
+        StateHasChanged();
+    }
+
+    private void HandleKeyUp(KeyboardEventArgs e)
+    {
+        if(e.Key == "Enter")
+        {
+            SendMessage();
+        }
+    }
+
+    private void ToggleActiveTyping()
+    {
+        isTyping = !isTyping;
+    }
+
+    private void SimulateAttachment()
+    {
+        // Push a beautiful simulated reflection post with an image attachment!
+        chatMessages.Add(new ChatMsg {
+            Id = nextMessageId++,
+            Author = "Maya Chen",
+            Avatar = "https://lh3.googleusercontent.com/aida-public/AB6AXuCHO2ix-EW9vEWMwGC57wDxQwP2n_3Ff2lVH5HGUZ-tXfaVKEqiGzmDAjH2qiAwWv0j1ij1G1BdKw32ploS1r2onqxJ10M8F325tYLgFv3qQ2d2uQMGj7XbZNEyXAnzme4AizMCiz4zMtC5FFcG_HVviddCb2PqpjcHGXtkTBxvLX_T3n5VOO6MqdjV1dzGgMczb8lckoRAxlg-QzBRtx6nPDugywegiOFFxok_pqDokix96LRUJROkBUOYuop7PWdk5yP5RrqfWUA",
+            Text = "Shared a photo from our last hangout — good memories always help on tough days.",
+            Time = DateTime.Now.ToString("hh:mm tt"),
+            IsSent = false,
+            ImageAttachment = "https://lh3.googleusercontent.com/aida-public/AB6AXuCHO2ix-EW9vEWMwGC57wDxQwP2n_3Ff2lVH5HGUZ-tXfaVKEqiGzmDAjH2qiAwWv0j1ij1G1BdKw32ploS1r2onqxJ10M8F325tYLgFv3qQ2d2uQMGj7XbZNEyXAnzme4AizMCiz4zMtC5FFcG_HVviddCb2PqpjcHGXtkTBxvLX_T3n5VOO6MqdjV1dzGgMczb8lckoRAxlg-QzBRtx6nPDugywegiOFFxok_pqDokix96LRUJROkBUOYuop7PWdk5yP5RrqfWUA",
+            Reactions = new() {
+                new ReactionItem { Emoji = "❤️", Count = 1, UserReacted = false }
+            }
+        });
+        StateHasChanged();
+    }
+
+    private void NavigateBack()
+    {
+        Navigation.NavigateTo("messages");
+    }
+}
+

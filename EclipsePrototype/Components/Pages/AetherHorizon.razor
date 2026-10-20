@@ -1,0 +1,119 @@
+@page "/aether-horizon"
+
+<div class="relative z-10 flex flex-col flex-grow">
+    <main class="flex-grow flex flex-col items-center justify-start px-6 py-8 mt-16 max-w-4xl mx-auto w-full">
+        <!-- Journal Header -->
+        <div class="w-full text-center md:text-left mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4">
+            <div>
+                <p class="font-headline font-bold text-primary-container tracking-widest uppercase text-[10px] mb-2">Private space</p>
+                <h2 class="font-headline font-black text-4xl text-on-background tracking-tighter leading-none">
+                    Journal <span class="text-primary-container">Diary</span>
+                </h2>
+                <p class="text-on-surface-variant text-sm mt-2 max-w-md">Reflect, plan, and track how you're feeling — all in one place.</p>
+            </div>
+            <div class="bg-surface-container-low px-4 py-2 border border-outline-variant/20 rounded-xl">
+                 <span class="text-[10px] uppercase tracking-widest text-on-surface-variant font-bold">Today's mood</span>
+                 <p class="text-[#FFD23F] font-bold font-headline">Cheerful · 75% battery</p>
+            </div>
+        </div>
+
+        <!-- Quick Links to Journal Sections -->
+        <div class="w-full grid grid-cols-2 md:grid-cols-3 gap-3 mb-6">
+            <button class="glass-effect border border-outline-variant/10 rounded-2xl p-4 text-left hover:border-primary-container/30 transition-colors active:scale-[0.98]" @onclick="() => NavigateTo(\"jd/todays-plan\")">
+                <span class="material-symbols-outlined text-primary-container mb-2">today</span>
+                <span class="block text-sm font-bold text-on-surface">Today's Plan</span>
+                <span class="text-[10px] text-outline">Daily tasks & goals</span>
+            </button>
+            <button class="glass-effect border border-outline-variant/10 rounded-2xl p-4 text-left hover:border-primary-container/30 transition-colors active:scale-[0.98]" @onclick="() => NavigateTo(\"jd/daily-reflections\")">
+                <span class="material-symbols-outlined text-tertiary-container mb-2">edit_note</span>
+                <span class="block text-sm font-bold text-on-surface">Reflections</span>
+                <span class="text-[10px] text-outline">Write how you feel</span>
+            </button>
+            <button class="glass-effect border border-outline-variant/10 rounded-2xl p-4 text-left hover:border-primary-container/30 transition-colors active:scale-[0.98]" @onclick="() => NavigateTo(\"jd/your-ambitions\")">
+                <span class="material-symbols-outlined text-emerald-400 mb-2">flag</span>
+                <span class="block text-sm font-bold text-on-surface">Ambitions</span>
+                <span class="text-[10px] text-outline">Long-term goals</span>
+            </button>
+            <button class="glass-effect border border-outline-variant/10 rounded-2xl p-4 text-left hover:border-primary-container/30 transition-colors active:scale-[0.98]" @onclick="() => NavigateTo(\"jd/steps-to-reach-goals\")">
+                <span class="material-symbols-outlined text-fuchsia-400 mb-2">checklist</span>
+                <span class="block text-sm font-bold text-on-surface">Action Steps</span>
+                <span class="text-[10px] text-outline">Break goals down</span>
+            </button>
+            <button class="glass-effect border border-outline-variant/10 rounded-2xl p-4 text-left hover:border-primary-container/30 transition-colors active:scale-[0.98]" @onclick="() => NavigateTo(\"jd/research\")">
+                <span class="material-symbols-outlined text-outline mb-2">menu_book</span>
+                <span class="block text-sm font-bold text-on-surface">Research</span>
+                <span class="text-[10px] text-outline">Notes & resources</span>
+            </button>
+            <button class="glass-effect border border-outline-variant/10 rounded-2xl p-4 text-left hover:border-primary-container/30 transition-colors active:scale-[0.98]" @onclick="() => NavigateTo(\"dm/mood-meter\")">
+                <span class="material-symbols-outlined text-[#FFD23F] mb-2">mood</span>
+                <span class="block text-sm font-bold text-on-surface">Mood Meter</span>
+                <span class="text-[10px] text-outline">Track emotions</span>
+            </button>
+        </div>
+
+        <!-- Daily Check-in -->
+        <div class="w-full glass-effect border border-outline-variant/10 rounded-3xl p-6 mb-6 hover:border-primary-container/30 transition-colors duration-500">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-on-surface font-headline font-bold text-xl">Daily Check-in</h3>
+                <span class="bg-primary-container/20 text-primary-container px-3 py-1 rounded text-xs font-bold font-label uppercase tracking-widest">
+                    @(tasks.Count(t => t.IsComplete)) / @tasks.Count
+                </span>
+            </div>
+
+            <div class="flex flex-col gap-3">
+                @foreach(var t in tasks)
+                {
+                    <button class="flex items-center text-left gap-4 bg-surface-container-highest p-4 rounded-2xl hover:bg-surface-variant transition-all active:scale-[0.98] group" @onclick="() => ToggleTask(t)">
+                        <div class="w-8 h-8 rounded-full flex items-center justify-center border-2 transition-colors @(t.IsComplete ? "border-primary-container bg-primary-container/20 text-primary-container" : "border-outline-variant/50 text-transparent")">
+                            <span class="material-symbols-outlined text-sm">check</span>
+                        </div>
+                        <span class="font-body text-sm @(t.IsComplete ? "text-on-surface-variant line-through opacity-70" : "text-on-surface font-medium") transition-all">
+                            @t.Text
+                        </span>
+                    </button>
+                }
+            </div>
+        </div>
+        
+        <!-- Wellness Actions -->
+        <div class="w-full grid grid-cols-2 gap-4">
+            <button class="glass-effect border border-outline-variant/10 rounded-3xl p-6 text-center hover:bg-surface-container-highest transition-colors flex flex-col items-center justify-center group" @onclick="() => NavigateTo(\"dm/social-battery-indicator\")">
+                <span class="material-symbols-outlined text-3xl mb-3 text-primary-container group-hover:scale-110 transition-transform">battery_charging_full</span>
+                <span class="text-sm font-bold text-on-surface uppercase tracking-wider mb-1">Social Battery</span>
+                <span class="text-[10px] text-primary-container font-label uppercase">Share how you feel</span>
+            </button>
+            <button class="glass-effect border border-outline-variant/10 rounded-3xl p-6 text-center hover:bg-surface-container-highest transition-colors flex flex-col items-center justify-center group" @onclick="() => NavigateTo(\"messages\")">
+                <span class="material-symbols-outlined text-3xl mb-3 text-tertiary-container group-hover:scale-110 transition-transform">chat</span>
+                <span class="text-sm font-bold text-on-surface uppercase tracking-wider mb-1">Messages</span>
+                <span class="text-[10px] text-tertiary-container font-label uppercase">Chat & therapist access</span>
+            </button>
+        </div>
+
+    </main>
+</div>
+
+@code {
+    [Inject]
+    private NavigationManager Navigation { get; set; } = default!;
+
+    public class RoutineTask {
+        public string Text {get;set;} = "";
+        public bool IsComplete {get;set;} = false;
+    }
+
+    private List<RoutineTask> tasks = new() {
+        new RoutineTask { Text = "Log how I'm feeling today", IsComplete = true },
+        new RoutineTask { Text = "Write a short journal reflection" },
+        new RoutineTask { Text = "Check in with a friend or therapist" },
+    };
+
+    private void ToggleTask(RoutineTask task)
+    {
+        task.IsComplete = !task.IsComplete;
+    }
+
+    private void NavigateTo(string route)
+    {
+        Navigation.NavigateTo(route);
+    }
+}

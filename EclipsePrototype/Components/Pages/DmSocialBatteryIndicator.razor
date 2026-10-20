@@ -1,0 +1,383 @@
+@page "/dm/social-battery-indicator"
+@layout AuthLayout
+
+<style>
+    /* CSS Animations for high-tech feels */
+    .glow-pulse-high {
+        animation: pulse-glow-high 2s infinite alternate;
+    }
+    .glow-pulse-med {
+        animation: pulse-glow-med 3s infinite alternate;
+    }
+    .glow-pulse-low {
+        animation: pulse-glow-low 1.5s infinite alternate;
+    }
+    
+    @@keyframes pulse-glow-high {
+        0% { box-shadow: 0 0 10px rgba(255, 210, 63, 0.2), inset 0 0 5px rgba(255, 210, 63, 0.1); }
+        100% { box-shadow: 0 0 25px rgba(255, 210, 63, 0.6), inset 0 0 12px rgba(255, 210, 63, 0.3); }
+    }
+    @@keyframes pulse-glow-med {
+        0% { box-shadow: 0 0 10px rgba(0, 219, 236, 0.2), inset 0 0 5px rgba(0, 219, 236, 0.1); }
+        100% { box-shadow: 0 0 25px rgba(0, 219, 236, 0.5), inset 0 0 12px rgba(0, 219, 236, 0.3); }
+    }
+    @@keyframes pulse-glow-low {
+        0% { box-shadow: 0 0 8px rgba(255, 180, 171, 0.2), inset 0 0 4px rgba(255, 180, 171, 0.1); }
+        100% { box-shadow: 0 0 25px rgba(255, 180, 171, 0.7), inset 0 0 15px rgba(255, 180, 171, 0.4); }
+    }
+</style>
+
+<div class="relative z-10 flex flex-col flex-grow">
+    <!-- TopAppBar -->
+    <header class="fixed top-0 w-full z-50 flex justify-between items-center px-6 h-16 bg-[#2A2A2A] border-b border-outline-variant/10 shadow-md">
+        <div class="flex items-center gap-4">
+            <button class="hover:bg-[#353534] transition-colors p-2 rounded-full active:scale-95 duration-150" @onclick="NavigateBack">
+                <span class="material-symbols-outlined text-[#E5E2E1]">arrow_back</span>
+            </button>
+            <div>
+                <h1 class="font-headline font-black tracking-tighter text-[#FFD23F] drop-shadow-[0_0_10px_rgba(255,210,63,0.3)] text-lg leading-none">Social Battery</h1>
+                <span class="font-label text-xs text-[#E5E2E1]/60 uppercase tracking-widest">Share how you feel</span>
+            </div>
+        </div>
+        <div class="flex items-center gap-2">
+            <span class="text-xs font-label uppercase tracking-wider text-outline px-3 py-1 bg-surface-container-low border border-outline-variant/10 rounded-lg">Status: <span class="@(isSyncing ? "text-primary-container animate-pulse" : "text-emerald-400 font-bold")">@syncState</span></span>
+        </div>
+    </header>
+
+    <main class="flex-grow flex flex-col px-4 md:px-8 py-8 mt-16 max-w-5xl mx-auto w-full pb-28">
+        <!-- Dashboard Header -->
+        <div class="w-full text-center md:text-left mb-8">
+            <h2 class="font-headline font-black text-4xl text-on-background tracking-tighter leading-none">
+                How You're <span class="text-primary-container">Feeling</span>
+            </h2>
+            <p class="text-on-surface-variant text-base mt-2">Let friends and therapists know your mood and social energy before you chat.</p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 w-full items-start">
+            <!-- Left Side: Social Battery Display Core -->
+            <section class="lg:col-span-5 flex flex-col gap-6 w-full">
+                <div class="glass-panel rounded-3xl p-6 border border-outline-variant/10 flex flex-col items-center justify-center text-center relative overflow-hidden">
+                    <!-- Background ambient glow matched to active level -->
+                    <div class="absolute inset-0 bg-gradient-to-b @(BatteryBgGradient) opacity-10 pointer-events-none transition-all duration-700"></div>
+                    
+                    <h3 class="text-on-surface font-headline font-extrabold text-lg mb-4 uppercase tracking-widest text-outline">Social Battery</h3>
+                    
+                    <!-- SCI-FI BATTERY CELL -->
+                    <div class="relative w-52 h-28 my-6 flex items-center justify-start p-1.5 transition-all duration-300">
+                        <!-- Glass Tube Outline -->
+                        <div class="absolute inset-0 border-4 @(BatteryBorderColor) rounded-2xl bg-[#131313]/40 backdrop-blur-sm @(GlowPulseClass) transition-all duration-700"></div>
+                        
+                        <!-- Battery Fill -->
+                        <div class="h-full rounded-xl transition-all duration-700 ease-out bg-gradient-to-r @(BatteryFillGradient)" style="width: @(batteryLevel)%;">
+                            <!-- Glowing interior energy nodes -->
+                            <div class="w-full h-full bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.4)_0%,transparent_80%)] animate-pulse"></div>
+                        </div>
+                        
+                        <!-- Battery Cap / Node -->
+                        <div class="absolute -right-3 top-1/3 w-3.5 h-1/3 border-y-4 border-r-4 @(BatteryBorderColor) bg-[#131313] rounded-r-lg z-10 transition-all duration-700"></div>
+                        
+                        <!-- Floating Active Mood Symbol inside capacitor -->
+                        <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+                            <span class="material-symbols-outlined text-4xl text-white drop-shadow-[0_0_12px_rgba(255,255,255,0.5)] animate-bounce" style="animation-duration: 3s;">
+                                @(GetMoodIcon())
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <p class="text-on-surface text-5xl font-headline font-black tracking-tighter drop-shadow-[0_0_15px_rgba(255,255,255,0.1)]">@batteryLevel%</p>
+                        <p class="text-on-surface-variant font-label text-[10px] uppercase tracking-widest mt-1">Energy for social interaction</p>
+                    </div>
+
+                    <p class="text-on-surface-variant text-sm font-medium leading-relaxed max-w-sm px-2">
+                        @(GetBatteryMessage())
+                    </p>
+
+                    <!-- Tactical slider bar -->
+                    <div class="mt-8 w-full relative z-10">
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-xs font-bold text-outline uppercase tracking-wider">Adjust level</span>
+                            <span class="text-xs font-bold @(BatteryTextColor) font-headline">@(batteryLevel > 0 ? $"{batteryLevel}%" : "Depleted")</span>
+                        </div>
+                        <input type="range" min="0" max="100" @bind="batteryLevel" class="w-full h-2 bg-surface-container-highest rounded-lg appearance-none cursor-pointer accent-primary-container border border-outline-variant/10 focus:outline-none" />
+                        <div class="flex justify-between text-[9px] text-outline/50 font-label mt-1 uppercase tracking-widest px-1">
+                            <span>Need space</span>
+                            <span>Balanced</span>
+                            <span>Very social</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Custom thought status input card -->
+                <div class="glass-panel rounded-3xl p-6 border border-outline-variant/10">
+                    <h3 class="text-on-surface font-headline font-extrabold text-sm mb-4 uppercase tracking-widest text-outline">Status note</h3>
+                    <div class="relative">
+                        <span class="material-symbols-outlined absolute top-3 left-4 text-outline/50">border_color</span>
+                        <textarea @bind="statusThought" @bind:event="oninput" placeholder="Add a short note about how you're feeling..." class="w-full bg-surface-container-highest text-on-surface placeholder:text-outline/40 border border-outline-variant/20 rounded-2xl py-3 pl-12 pr-4 text-sm focus:ring-1 focus:ring-primary-container/40 outline-none h-24 resize-none transition-all focus:border-primary-container/40"></textarea>
+                    </div>
+                    <p class="text-outline text-[10px] mt-2 font-label leading-tight">Friends and your therapist will see this on your profile and in messages.</p>
+                </div>
+            </section>
+
+            <!-- Right Side: Mood Selector & Sync Preview -->
+            <section class="lg:col-span-7 flex flex-col gap-6 w-full">
+                <!-- Mood Grid -->
+                <div class="glass-panel rounded-3xl p-6 border border-outline-variant/10">
+                    <h3 class="text-on-surface font-headline font-extrabold text-sm mb-4 uppercase tracking-widest text-outline">Current Mood</h3>
+                    
+                    <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-4 lg:grid-cols-3 gap-3 mb-6">
+                        @foreach (var mood in MoodsList)
+                        {
+                            var isActive = selectedMood == mood.Name;
+                            <button @onclick="() => SelectMood(mood.Name)"
+                                    class="flex flex-col items-center justify-center p-3 rounded-2xl border-2 transition-all duration-300 relative overflow-hidden active:scale-95 group @(isActive ? $"{mood.ActiveBorder} bg-surface-container shadow-[0_0_15px_{mood.ColorHex}15]" : "border-outline-variant/10 bg-surface-container-lowest hover:bg-surface-container-high")">
+                                
+                                @if (isActive)
+                                {
+                                    <!-- Dynamic miniature glow circle in corner of active card -->
+                                    <div class="absolute top-0 right-0 w-8 h-8 rounded-bl-full pointer-events-none opacity-20" style="background-color: @(mood.ColorHex);"></div>
+                                }
+                                
+                                <span class="material-symbols-outlined text-3xl mb-1.5 transition-transform group-hover:scale-110 duration-300 @(isActive ? mood.ActiveTextColor : "text-outline/70 group-hover:text-on-surface")">
+                                    @mood.Icon
+                                </span>
+                                <span class="text-xs font-headline font-bold @(isActive ? "text-on-surface font-extrabold" : "text-outline/80")">
+                                    @mood.Name
+                                </span>
+                                <span class="text-[9px] font-label font-medium uppercase tracking-wider text-outline/50 mt-0.5">
+                                    @mood.Desc
+                                </span>
+                            </button>
+                        }
+                    </div>
+                </div>
+
+                <!-- Interactive Aether Preview Card -->
+                <div class="glass-panel rounded-3xl p-6 border border-outline-variant/10 relative overflow-hidden">
+                    <div class="absolute top-0 right-0 w-32 h-32 bg-primary-container/5 blur-[50px] rounded-full pointer-events-none"></div>
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-on-surface font-headline font-extrabold text-sm uppercase tracking-widest text-outline">Profile Preview</h3>
+                        <span class="bg-primary-container/10 border border-primary-container/30 text-primary-container px-2 py-0.5 rounded text-[8px] font-label font-bold uppercase tracking-widest">Live</span>
+                    </div>
+
+                    <!-- Beautiful simulated post that reflects inputs immediately -->
+                    <div class="bg-surface-container-highest p-5 rounded-2xl border border-outline-variant/10 relative overflow-hidden flex gap-4">
+                        <div class="relative shrink-0">
+                            <img alt="Your Avatar" class="w-12 h-12 rounded-xl object-cover border border-outline-variant/20" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBaKv2ynSrU_e8VTjjOHTm7JJECEkWX04ack4ppeG--CvVyP68vFnQlbMpmefGehlXhgmC0a13Ad8GLJ5S5IvL0W6bh7MhBbSIE6Ad6ushR6rBavD18UXBP6f9V8ewzmTtjA3Wox48fDKnLXyb4xImq1op45hcwsFq4z41JCfdNNNZVViUkJPkWSPGKOcZ98iolypuVZEaLD-GfUpX4HpW6Ydgnj0W0UDQ3VgXOgOVnB9jTM0LXnTYVwgK9AKjp3jMkX0DUWn6eGC0"/>
+                            <!-- Glowing mood indicator dot -->
+                            <span class="absolute -bottom-1 -right-1 w-5 h-5 rounded-full border-2 border-surface-container-highest flex items-center justify-center text-[10px] shadow-lg shadow-black/50" style="background-color: @(GetActiveMoodColor());">
+                                @(GetMoodEmoji())
+                            </span>
+                        </div>
+                        
+                        <div class="flex-1 min-w-0">
+                            <div class="flex justify-between items-baseline mb-1">
+                                <h4 class="font-headline font-bold text-sm text-[#FFD23F] drop-shadow-[0_0_8px_rgba(255,210,63,0.2)]">Alex Morgan (You)</h4>
+                                <span class="text-[9px] font-label font-medium text-outline uppercase tracking-wider">Visible to contacts</span>
+                            </div>
+                            
+                            <div class="flex flex-wrap items-center gap-2 mb-3">
+                                <span class="px-2 py-0.5 rounded bg-surface-container-low border border-outline-variant/25 text-[10px] font-bold @(BatteryTextColor) flex items-center gap-1">
+                                    <span class="material-symbols-outlined text-xs">battery_charging_full</span> Social Battery: @batteryLevel%
+                                </span>
+                                <span class="px-2 py-0.5 rounded bg-surface-container-low border border-outline-variant/25 text-[10px] text-on-surface font-semibold flex items-center gap-1">
+                                    <span class="material-symbols-outlined text-xs @(GetActiveMoodClass())">@(GetMoodIcon())</span> Mood: @selectedMood
+                                </span>
+                            </div>
+
+                            <p class="font-body text-sm text-on-surface leading-relaxed break-words bg-[#131313]/30 p-3 rounded-xl border border-outline-variant/10 italic">
+                                "@(string.IsNullOrWhiteSpace(statusThought) ? "No status note yet." : statusThought)"
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Large futuristic trigger action button -->
+                <button @onclick="SyncStatusToAether" disabled="@isSyncing"
+                        class="w-full relative overflow-hidden group py-4 rounded-2xl bg-[#FFD23F] text-[#3D2F00] font-headline font-extrabold text-base shadow-[0_4px_25px_rgba(255,210,63,0.3)] hover:shadow-[0_6px_35px_rgba(255,210,63,0.4)] active:scale-[0.98] transition-all disabled:opacity-50 disabled:pointer-events-none flex items-center justify-center gap-3">
+                    
+                    @if (isSyncing)
+                    {
+                        <!-- Spinning ring -->
+                        <span class="w-5 h-5 rounded-full border-2 border-[#3D2F00] border-t-transparent animate-spin"></span>
+                        <span>Updating status...</span>
+                    }
+                    else
+                    {
+                        <span class="material-symbols-outlined text-xl group-hover:rotate-45 transition-transform" style="font-variation-settings: 'FILL' 1;">sync</span>
+                        <span>Update Status</span>
+                    }
+                    
+                    <!-- Decorative dynamic neon line reflecting sync process -->
+                    <div class="absolute bottom-0 left-0 h-1 bg-white transition-all duration-[2000ms] ease-out" style="width: @(syncProgress)%;"></div>
+                </button>
+            </section>
+        </div>
+    </main>
+
+    <!-- Successful sync notification toast -->
+    @if (showToast)
+    {
+        <div class="fixed bottom-24 left-1/2 -translate-x-1/2 z-50 glass-effect border border-emerald-500/30 rounded-2xl px-6 py-4 flex items-center gap-3 shadow-[0_10px_35px_rgba(0,0,0,0.6)] shadow-emerald-500/5 animate-bounce">
+            <div class="w-8 h-8 rounded-full bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
+                <span class="material-symbols-outlined text-lg">check_circle</span>
+            </div>
+            <div>
+                <h4 class="font-headline font-extrabold text-sm text-[#E5E2E1] leading-none mb-1">Status updated</h4>
+                <p class="text-xs text-outline leading-none">Your mood and social battery are now visible to your contacts.</p>
+            </div>
+        </div>
+    }
+
+    <!-- BottomNavbar Placeholder to maintain design alignment -->
+    <BottomNavbar />
+</div>
+
+@code {
+    [Inject]
+    private NavigationManager Navigation { get; set; } = default!;
+
+    private int batteryLevel = 75; 
+    private string selectedMood = "Cheerful"; 
+    private string statusThought = "Feeling more open to conversation today.";
+    
+    private bool isSyncing = false;
+    private int syncProgress = 0;
+    private string syncState = "Saved";
+    private bool showToast = false;
+
+    // Mood detailed item configuration
+    private class MoodInfo
+    {
+        public string Name { get; set; } = "";
+        public string Icon { get; set; } = "";
+        public string Desc { get; set; } = "";
+        public string Emoji { get; set; } = "";
+        public string ColorHex { get; set; } = "";
+        public string ActiveBorder { get; set; } = "";
+        public string ActiveTextColor { get; set; } = "";
+    }
+
+    private List<MoodInfo> MoodsList = new()
+    {
+        new MoodInfo { Name = "Ecstatic", Icon = "sentiment_very_satisfied", Desc = "Elated", Emoji = "✨", ColorHex = "#FFD23F", ActiveBorder = "border-[#FFD23F]", ActiveTextColor = "text-[#FFD23F]" },
+        new MoodInfo { Name = "Cheerful", Icon = "sentiment_satisfied", Desc = "Content", Emoji = "😊", ColorHex = "#ffe089", ActiveBorder = "border-[#ffe089]", ActiveTextColor = "text-[#ffe089]" },
+        new MoodInfo { Name = "Serene", Icon = "self_care", Desc = "Calm", Emoji = "🍃", ColorHex = "#00dbec", ActiveBorder = "border-[#00dbec]", ActiveTextColor = "text-[#00dbec]" },
+        new MoodInfo { Name = "Neutral", Icon = "sentiment_neutral", Desc = "Steady", Emoji = "😐", ColorHex = "#c8c6c5", ActiveBorder = "border-[#c8c6c5]", ActiveTextColor = "text-[#c8c6c5]" },
+        new MoodInfo { Name = "Bored", Icon = "sentiment_dissatisfied", Desc = "Restless", Emoji = "😴", ColorHex = "#a8a8a8", ActiveBorder = "border-outline", ActiveTextColor = "text-outline" },
+        new MoodInfo { Name = "Melancholic", Icon = "sentiment_sad", Desc = "Down", Emoji = "🌧️", ColorHex = "#87f3ff", ActiveBorder = "border-[#87f3ff]", ActiveTextColor = "text-[#87f3ff]" },
+        new MoodInfo { Name = "Miserable", Icon = "sentiment_very_dissatisfied", Desc = "Grieving", Emoji = "💔", ColorHex = "#ffb4ab", ActiveBorder = "border-error", ActiveTextColor = "text-error" }
+    };
+
+    private string GetMoodIcon()
+    {
+        var mood = MoodsList.FirstOrDefault(m => m.Name == selectedMood);
+        return mood?.Icon ?? "sentiment_neutral";
+    }
+
+    private string GetMoodEmoji()
+    {
+        var mood = MoodsList.FirstOrDefault(m => m.Name == selectedMood);
+        return mood?.Emoji ?? "😐";
+    }
+
+    private string GetActiveMoodColor()
+    {
+        var mood = MoodsList.FirstOrDefault(m => m.Name == selectedMood);
+        return mood?.ColorHex ?? "#c8c6c5";
+    }
+
+    private string GetActiveMoodClass()
+    {
+        var mood = MoodsList.FirstOrDefault(m => m.Name == selectedMood);
+        return mood?.ActiveTextColor ?? "text-outline";
+    }
+
+    private void SelectMood(string moodName)
+    {
+        selectedMood = moodName;
+    }
+
+    // Dynamic Styling computed properties for the sci-fi battery core
+    private string GlowPulseClass => 
+        batteryLevel > 79 ? "glow-pulse-high" :
+        batteryLevel > 39 ? "glow-pulse-med" :
+        "glow-pulse-low";
+
+    private string BatteryBorderColor => 
+        batteryLevel > 79 ? "border-primary-container" :
+        batteryLevel > 39 ? "border-tertiary-container" :
+        batteryLevel > 14 ? "border-primary-container/60" :
+        "border-error shadow-lg shadow-error/15";
+
+    private string BatteryFillGradient => 
+        batteryLevel > 79 ? "from-[#FFD23F] to-[#ffe089]" :
+        batteryLevel > 39 ? "from-[#00baea] to-[#00dbec]" :
+        batteryLevel > 14 ? "from-[#e5a93c] to-[#ffe089]" :
+        "from-error to-[#ffdad6] animate-pulse";
+
+    private string BatteryTextColor => 
+        batteryLevel > 79 ? "text-primary-container" :
+        batteryLevel > 39 ? "text-tertiary-container" :
+        batteryLevel > 14 ? "text-[#ffe089]" :
+        "text-error animate-pulse";
+
+    private string BatteryBgGradient => 
+        batteryLevel > 79 ? "from-[#FFD23F]" :
+        batteryLevel > 39 ? "from-[#00dbec]" :
+        batteryLevel > 14 ? "from-[#e5a93c]" :
+        "from-error";
+
+    private string GetBatteryMessage()
+    {
+        if (batteryLevel > 79)
+        {
+            return "You're feeling socially energized. Great time to connect with friends or message your therapist.";
+        }
+        else if (batteryLevel > 39)
+        {
+            return "You have moderate social energy. Good for a few conversations at your own pace.";
+        }
+        else if (batteryLevel > 14)
+        {
+            return "Your social battery is running low. It's okay to keep conversations brief or take a break.";
+        }
+        else
+        {
+            return "You need rest. Consider turning off notifications and reaching out only when you're ready.";
+        }
+    }
+
+    private void NavigateBack()
+    {
+        Navigation.NavigateTo("status");
+    }
+
+    private async Task SyncStatusToAether()
+    {
+        if (isSyncing) return;
+
+        isSyncing = true;
+        syncState = "Updating...";
+        syncProgress = 0;
+        
+        // Beautiful simulated steps of synchronization loading
+        while (syncProgress < 100)
+        {
+            syncProgress += 10;
+            StateHasChanged();
+            await Task.Delay(150);
+        }
+
+        isSyncing = false;
+        syncState = "Saved";
+        showToast = true;
+        StateHasChanged();
+
+        // Let the successful notification float for 3.5 seconds
+        await Task.Delay(3500);
+        showToast = false;
+        StateHasChanged();
+    }
+}
+

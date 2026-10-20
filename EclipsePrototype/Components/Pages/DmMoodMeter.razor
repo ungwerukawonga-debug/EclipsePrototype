@@ -1,0 +1,57 @@
+@page "/dm/mood-meter"
+
+<div class="relative z-10 flex flex-col flex-grow">
+    <main class="flex-grow flex flex-col items-center justify-start px-6 py-8 mt-16 max-w-4xl mx-auto w-full">
+        <!-- Page Header -->
+        <div class="w-full text-center md:text-left mb-8">
+            <h2 class="font-headline font-black text-4xl text-on-background tracking-tighter leading-none">
+                Mood <span class="text-primary-container">Meter</span>
+            </h2>
+            <p class="text-on-surface-variant text-lg mt-2">Track and understand your emotional state.</p>
+        </div>
+
+        <!-- Mood Selection Section -->
+        <div class="w-full glass-effect border border-outline-variant/10 rounded-3xl p-6 mb-6">
+            <h3 class="text-on-surface font-headline font-bold text-xl mb-4">How are you feeling?</h3>
+            <div class="flex flex-wrap justify-center gap-4 mb-6">
+                @foreach (var moodOption in MoodOptions)
+                {
+                    <button @onclick="() => SelectMood(moodOption.Key)"
+                            class="flex flex-col items-center p-4 rounded-xl transition-all @(selectedMood == moodOption.Key ? "bg-primary-container/20 border-primary-container" : "bg-surface-container-highest border-transparent hover:bg-surface-variant") border-2">
+                        <span class="material-symbols-outlined text-3xl @(selectedMood == moodOption.Key ? "text-primary-container" : "text-on-surface-variant")">@moodOption.Value</span>
+                        <span class="text-xs font-body mt-1 @(selectedMood == moodOption.Key ? "text-primary-container font-bold" : "text-on-surface-variant")">@moodOption.Key</span>
+                    </button>
+                }
+            </div>
+            <div class="text-center">
+                <p class="text-on-surface-variant text-sm">Current Mood: <span class="font-bold text-primary-container">@(selectedMood ?? "Not selected")</span></p>
+            </div>
+        </div>
+
+        <!-- Mood History Section (Placeholder) -->
+        <div class="w-full glass-effect border border-outline-variant/10 rounded-3xl p-6">
+            <h3 class="text-on-surface font-headline font-bold text-xl mb-4">Mood History</h3>
+            <p class="text-on-surface-variant text-sm">Your past mood entries will appear here.</p>
+        </div>
+    </main>
+</div>
+
+@code {
+    private string? selectedMood;
+
+    private Dictionary<string, string> MoodOptions = new Dictionary<string, string>
+    {
+        { "Ecstatic", "sentiment_very_satisfied" },
+        { "Cheerful", "sentiment_satisfied" },
+        { "Serene", "sentiment_calm" },
+        { "Neutral", "sentiment_neutral" },
+        { "Bored", "sentiment_dissatisfied" },
+        { "Melancholic", "sentiment_sad" },
+        { "Miserable", "sentiment_very_dissatisfied" }
+    };
+
+    private void SelectMood(string mood)
+    {
+        selectedMood = mood;
+    }
+}

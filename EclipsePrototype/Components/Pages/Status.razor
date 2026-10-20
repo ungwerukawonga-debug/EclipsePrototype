@@ -1,0 +1,119 @@
+@page "/status"
+@inject NavigationManager Navigation
+
+<main class="pt-24 pb-32 px-6 max-w-4xl mx-auto flex-grow h-full w-full">
+    <!-- Header -->
+    <div class="mb-10 text-center relative z-10">
+        <div class="w-24 h-24 mx-auto rounded-full overflow-hidden border-2 border-primary-container shadow-[0_0_20px_rgba(255,210,63,0.3)] mb-4 relative group">
+             <img alt="Profile Avatar" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBaKv2ynSrU_e8VTjjOHTm7JJECEkWX04ack4ppeG--CvVyP68vFnQlbMpmefGehlXhgmC0a13Ad8GLJ5S5IvL0W6bh7MhBbSIE6Ad6ushR6rBavD18UXBP6f9V8ewzmTtjA3Wox48fDKnLXyb4xImq1op45hcwsFq4z41JCfdNNNZVViUkJPkWSPGKOcZ98iolypuVZEaLD-GfUpX4HpW6Ydgnj0W0UDQ3VgXOgOVnB9jTM0LXnTYVwgK9AKjp3jMkX0DUWn6eGC0" class="w-full h-full object-cover" />
+             <div class="absolute inset-0 bg-primary-container/20 group-hover:bg-transparent transition-colors"></div>
+        </div>
+        <h2 class="text-3xl font-extrabold tracking-tighter font-headline text-on-surface mb-1">Alex Morgan</h2>
+        <p class="text-primary-container font-bold text-[10px] tracking-[0.2em] uppercase neon-glow rounded-full px-3 py-1 inline-block border border-primary-container/30 bg-primary-container/10">Wellness profile active</p>
+    </div>
+
+    <!-- Wellness Overview -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8 relative z-10">
+        <div class="glass-effect p-4 rounded-2xl border border-outline-variant/20 flex flex-col items-center justify-center text-center hover:bg-surface-variant transition-colors group cursor-default">
+            <span class="material-symbols-outlined text-primary-container mb-2 text-3xl group-hover:scale-110 transition-transform rounded-full">battery_charging_full</span>
+            <span class="text-2xl font-black font-headline text-on-surface">75%</span>
+            <span class="text-[10px] font-bold text-outline uppercase tracking-widest block mt-1">Social Battery</span>
+        </div>
+
+        <div class="glass-effect p-4 rounded-2xl border border-outline-variant/20 flex flex-col items-center justify-center text-center hover:bg-surface-variant transition-colors group cursor-default">
+            <span class="material-symbols-outlined text-tertiary-container mb-2 text-3xl group-hover:scale-110 transition-transform rounded-full">mood</span>
+            <span class="text-2xl font-black font-headline text-on-surface">😊</span>
+            <span class="text-[10px] font-bold text-outline uppercase tracking-widest block mt-1">Current Mood</span>
+        </div>
+
+        <div class="glass-effect p-4 rounded-2xl border border-outline-variant/20 flex flex-col items-center justify-center text-center hover:bg-surface-variant transition-colors group cursor-default">
+            <span class="material-symbols-outlined text-emerald-400 mb-2 text-3xl group-hover:scale-110 transition-transform rounded-full">chat</span>
+            <span class="text-2xl font-black font-headline text-on-surface">12</span>
+            <span class="text-[10px] font-bold text-outline uppercase tracking-widest block mt-1">Messages</span>
+        </div>
+
+        <div class="glass-effect p-4 rounded-2xl border border-outline-variant/20 flex flex-col items-center justify-center text-center hover:bg-surface-variant transition-colors group cursor-default">
+            <span class="material-symbols-outlined text-fuchsia-400 mb-2 text-3xl group-hover:scale-110 transition-transform rounded-full">support_agent</span>
+            <span class="text-2xl font-black font-headline text-on-surface">2</span>
+            <span class="text-[10px] font-bold text-outline uppercase tracking-widest block mt-1">Therapist Chats</span>
+        </div>
+    </div>
+
+    <!-- Social Battery Card -->
+    <div class="relative z-10 glass-panel p-6 rounded-2xl border border-outline-variant/20 mb-8 cursor-pointer hover:border-primary-container/40 transition-all flex justify-between items-center group relative overflow-hidden shadow-[0_4px_25px_rgba(0,0,0,0.4)]" @onclick="NavigateToSocialBattery">
+        <div class="absolute right-0 top-0 w-32 h-32 bg-[#FFD23F]/5 blur-[40px] pointer-events-none rounded-full group-hover:bg-[#FFD23F]/10 transition-colors"></div>
+        
+        <div class="flex gap-4 items-center min-w-0">
+            <div class="w-12 h-12 bg-primary-container/10 rounded-xl flex items-center justify-center border border-primary-container/30 text-[#FFD23F] group-hover:scale-105 group-hover:border-primary-container/60 transition-all shadow-[0_0_15px_rgba(255,210,63,0.15)] shrink-0">
+                <span class="material-symbols-outlined text-2xl">battery_charging_full</span>
+            </div>
+            <div class="min-w-0">
+                <h3 class="font-headline font-bold text-sm text-on-surface flex items-center gap-2">
+                    How You're Feeling
+                    <span class="bg-primary-container/20 text-[#FFD23F] text-[8px] font-bold px-1.5 py-0.5 rounded border border-primary-container/30">Updated</span>
+                </h3>
+                <p class="text-xs text-outline leading-tight mt-0.5">Mood: <span class="text-primary-container font-semibold">Cheerful 😊</span> · Social Battery: <span class="text-emerald-400 font-bold">75%</span></p>
+                <p class="text-[10px] text-outline/60 italic leading-tight mt-1 line-clamp-1">"Feeling more open to conversation today."</p>
+            </div>
+        </div>
+        <span class="material-symbols-outlined text-outline/50 group-hover:translate-x-1 group-hover:text-[#FFD23F] transition-all ml-4 shrink-0">chevron_right</span>
+    </div>
+
+    <!-- Support Access -->
+    <div class="relative z-10 glass-effect p-6 rounded-2xl border border-outline-variant/20 mb-8">
+        <h3 class="font-headline font-bold text-lg text-on-surface uppercase tracking-widest flex items-center gap-2 mb-4">
+            <span class="material-symbols-outlined text-emerald-400">support_agent</span> Support & Therapists
+        </h3>
+        
+        <div class="flex flex-col gap-3">
+            <div class="flex items-center gap-4 bg-surface-container-lowest p-3 rounded-xl border border-emerald-500/20 cursor-pointer hover:border-emerald-500/40 transition-colors" @onclick="NavigateToMessages">
+                <div class="w-12 h-12 bg-emerald-500/10 rounded-lg flex items-center justify-center border border-emerald-500/30 text-emerald-400">
+                    <span class="material-symbols-outlined">psychology</span>
+                </div>
+                <div class="flex-1">
+                    <h4 class="font-bold text-sm text-on-surface">Dr. Amara Okonkwo</h4>
+                    <p class="text-[10px] uppercase text-outline tracking-wider">Licensed Therapist · Available now</p>
+                </div>
+                <span class="text-xs font-bold text-emerald-400">Message</span>
+            </div>
+            
+            <div class="flex items-center gap-4 bg-surface-container-lowest p-3 rounded-xl border border-outline-variant/10 opacity-80">
+                <div class="w-12 h-12 bg-primary-container/5 rounded-lg flex items-center justify-center border border-primary-container/10 text-primary-container">
+                    <span class="material-symbols-outlined">calendar_month</span>
+                </div>
+                <div class="flex-1">
+                    <h4 class="font-bold text-sm text-on-surface">Book a Session</h4>
+                    <p class="text-[10px] uppercase text-outline tracking-wider">Schedule time with a therapist</p>
+                </div>
+                <span class="text-[10px] uppercase font-bold text-outline">Coming soon</span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Account Actions -->
+    <div class="relative z-10 flex gap-4">
+         <button class="flex-1 py-3 bg-surface-container hover:bg-surface-variant text-on-surface font-bold text-[10px] uppercase tracking-widest rounded-xl transition-colors border border-outline-variant/10 flex justify-center items-center gap-2" @onclick="NavigateToMoodMeter">
+             <span class="material-symbols-outlined text-sm">mood</span> Mood Meter
+         </button>
+         <button class="flex-[0.5] py-3 bg-error-container/20 hover:bg-error-container/40 text-error font-bold text-[10px] uppercase tracking-widest rounded-xl transition-colors border border-error/20 flex justify-center items-center gap-2">
+             <span class="material-symbols-outlined text-sm">logout</span> Sign Out
+         </button>
+    </div>
+</main>
+
+@code {
+    private void NavigateToSocialBattery()
+    {
+        Navigation.NavigateTo("dm/social-battery-indicator");
+    }
+
+    private void NavigateToMessages()
+    {
+        Navigation.NavigateTo("messages");
+    }
+
+    private void NavigateToMoodMeter()
+    {
+        Navigation.NavigateTo("dm/mood-meter");
+    }
+}

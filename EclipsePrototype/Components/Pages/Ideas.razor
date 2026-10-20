@@ -1,0 +1,103 @@
+@page "/ideas"
+
+<main class="pt-24 pb-32 px-6 max-w-4xl mx-auto flex-grow h-full w-full">
+    <!-- Header Area -->
+    <div class="mb-8 flex flex-col md:flex-row md:items-end justify-between relative z-10 gap-4">
+        <div>
+            <h2 class="text-4xl md:text-5xl font-extrabold tracking-tighter font-headline text-on-surface mb-2">Neural <span class="text-primary-container">Sparks</span></h2>
+            <p class="text-on-surface-variant font-body text-sm tracking-wide uppercase">Capture Your Digital Brainstorm</p>
+        </div>
+        <button class="flex items-center gap-2 bg-primary-container text-on-primary px-4 py-2 rounded-xl font-bold uppercase tracking-widest text-[10px] active:scale-95 transition-transform shadow-[0_0_15px_rgba(255,210,63,0.3)] w-auto shrink-0 self-start md:self-auto" @onclick="AddSpark">
+            <span class="material-symbols-outlined text-sm">add</span> Initialize Idea
+        </button>
+    </div>
+
+    <!-- Data Entry Box -->
+    <div class="relative z-10 glass-effect p-2 rounded-2xl border border-outline-variant/20 mb-8 flex items-center bg-surface-container-lowest">
+        <div class="px-4 text-primary-container">
+            <span class="material-symbols-outlined shadow-[0_0_10px_rgba(255,210,63,0.3)] rounded-full text-xl animate-pulse">lightbulb</span>
+        </div>
+        <input @bind="newSparkText" @bind:event="oninput" @onkeyup="HandleKeyUp" class="flex-1 bg-transparent border-none text-on-surface font-body text-sm py-4 px-2 focus:ring-0 outline-none placeholder:text-outline/50" placeholder="Encode a new fragment... (Press Enter to save)" type="text" />
+        <button class="mx-2 w-10 h-10 rounded-xl bg-surface-container hover:bg-surface-variant flex items-center justify-center transition-colors" @onclick="AddSpark">
+            <span class="material-symbols-outlined text-outline">done</span>
+        </button>
+    </div>
+
+    <!-- Sparks Grid Matrix -->
+    <div class="relative z-10 space-y-4">
+         <h3 class="text-[10px] font-bold uppercase tracking-[0.2em] text-outline mb-2">Stored Fragments</h3>
+         
+         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+             @foreach(var spark in storedSparks)
+             {
+                 var colorClass = spark.ColorClass;
+                 var hoverClass = spark.ColorClass == "primary-container" ? "hover:border-primary-container/50" :
+                                  spark.ColorClass == "tertiary-container" ? "hover:border-tertiary-container/50" :
+                                  spark.ColorClass == "fuchsia-400" ? "hover:border-fuchsia-400/50" :
+                                  "hover:border-emerald-400/50";
+                 var textClass = spark.ColorClass == "primary-container" ? "text-primary-container" :
+                                 spark.ColorClass == "tertiary-container" ? "text-tertiary-container" :
+                                 spark.ColorClass == "fuchsia-400" ? "text-fuchsia-400" :
+                                 "text-emerald-400";
+                 var glowClass = spark.ColorClass == "primary-container" ? "bg-primary-container/10" :
+                                 spark.ColorClass == "tertiary-container" ? "bg-tertiary-container/10" :
+                                 spark.ColorClass == "fuchsia-400" ? "bg-fuchsia-500/10" :
+                                 "bg-emerald-500/10";
+                                 
+                 <div class="glass-effect p-5 rounded-xl border border-outline-variant/20 @hoverClass transition-colors group cursor-pointer relative overflow-hidden flex flex-col">
+                     <div class="absolute top-0 right-0 w-20 h-20 @glowClass blur-[30px] rounded-full mix-blend-screen pointer-events-none"></div>
+                     <div class="flex justify-between items-start mb-3">
+                         <span class="bg-surface-container-highest border border-surface bg-opacity-80 px-2 py-1 rounded text-[9px] uppercase tracking-wider font-bold @textClass">@spark.Category</span>
+                         <span class="text-[10px] text-outline">@spark.Time</span>
+                     </div>
+                     <h4 class="font-headline font-bold text-lg text-on-surface mb-2">@spark.Title</h4>
+                     <p class="text-sm font-body text-on-surface-variant line-clamp-3 mb-4">@spark.Content</p>
+                     <div class="mt-auto flex justify-end">
+                         <span class="material-symbols-outlined text-outline group-hover:@textClass text-sm transition-colors">arrow_forward</span>
+                     </div>
+                 </div>
+             }
+         </div>
+    </div>
+</main>
+
+@code {
+    private class Spark
+    {
+        public string Title { get; set; } = "Fragment Sync";
+        public string Content { get; set; } = "";
+        public string Category { get; set; } = "Notes";
+        public string ColorClass { get; set; } = "tertiary-container";
+        public string Time { get; set; } = "Just now";
+    }
+    
+    private List<Spark> storedSparks = new()
+    {
+        new Spark { Title = "Fractal Energy Shield UI", Content = "Instead of a solid bar for the shield logic, what if we represented it using collapsing fractal waves? Adds to the \"No-Line\" rule.", Category = "Design", ColorClass = "primary-container", Time = "Today" },
+        new Spark { Title = "Sector 7 Collapse Event", Content = "Tie the \"Offline\" Guardian modes back to the lore where Sector 7 experienced the massive solar anomaly.", Category = "Lore", ColorClass = "tertiary-container", Time = "Yesterday" },
+        new Spark { Title = "Ambient Tones", Content = "Need to sync Audio attachment 34_d.wav into the login flow.", Category = "Audio", ColorClass = "fuchsia-400", Time = "Mar 12" }
+    };
+    
+    private string newSparkText = "";
+    
+    private void AddSpark()
+    {
+        if(string.IsNullOrWhiteSpace(newSparkText)) return;
+        
+        storedSparks.Insert(0, new Spark {
+            Content = newSparkText,
+            Category = "Unsorted",
+            ColorClass = "emerald-400"
+        });
+        
+        newSparkText = "";
+    }
+    
+    private void HandleKeyUp(KeyboardEventArgs e)
+    {
+        if(e.Key == "Enter")
+        {
+            AddSpark();
+        }
+    }
+}

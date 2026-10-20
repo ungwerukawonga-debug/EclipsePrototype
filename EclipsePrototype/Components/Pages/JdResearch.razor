@@ -1,0 +1,72 @@
+@page "/jd/research"
+
+<div class="relative z-10 flex flex-col flex-grow">
+    <main class="flex-grow flex flex-col items-center justify-start px-6 py-8 mt-16 max-w-4xl mx-auto w-full">
+        <!-- Page Header -->
+        <div class="w-full text-center md:text-left mb-8">
+            <h2 class="font-headline font-black text-4xl text-on-background tracking-tighter leading-none">
+                <span class="text-primary-container">Research</span>
+            </h2>
+            <p class="text-on-surface-variant text-lg mt-2">Explore and document new knowledge.</p>
+        </div>
+
+        <!-- Research Search and Add Section -->
+        <div class="w-full glass-effect border border-outline-variant/10 rounded-3xl p-6 mb-6">
+            <h3 class="text-on-surface font-headline font-bold text-xl mb-4">New Research Entry</h3>
+            <div class="flex gap-3 mb-4">
+                <input type="text" @bind="newResearchTopic" placeholder="Enter research topic or keywords..." class="flex-grow bg-surface-container-highest border-none rounded-xl py-3 px-4 text-on-surface placeholder:text-outline/50 focus:ring-1 focus:ring-primary-fixed-dim transition-all outline-none" />
+                <button @onclick="AddResearch" class="bg-primary-container hover:bg-primary-fixed-dim text-on-primary font-headline font-extrabold py-3 px-6 rounded-xl shadow-[0_4px_20px_rgba(255,210,63,0.3)] active:scale-[0.98] transition-all flex items-center justify-center gap-2">
+                    <span class="material-symbols-outlined text-xl">search</span> Search/Add
+                </button>
+            </div>
+            <textarea @bind="newResearchNotes" placeholder="Add your research notes here..." class="w-full bg-surface-container-highest border-none rounded-xl py-3 px-4 text-on-surface placeholder:text-outline/50 focus:ring-1 focus:ring-primary-fixed-dim transition-all outline-none h-32"></textarea>
+        </div>
+
+        <!-- Saved Research Section -->
+        <div class="w-full glass-effect border border-outline-variant/10 rounded-3xl p-6">
+            <h3 class="text-on-surface font-headline font-bold text-xl mb-4">Saved Research</h3>
+            <div class="flex flex-col gap-4">
+                @if (savedResearch.Any())
+                {
+                    @foreach (var research in savedResearch)
+                    {
+                        <div class="bg-surface-container-highest p-4 rounded-2xl">
+                            <p class="text-on-surface-variant text-xs mb-1">Topic: <span class="font-medium text-on-surface">@research.Topic</span></p>
+                            <p class="font-body text-sm text-on-surface">@research.Notes</p>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <p class="text-on-surface-variant text-sm">No saved research yet. Start exploring!</p>
+                }
+            </div>
+        </div>
+    </main>
+</div>
+
+@code {
+    private string newResearchTopic = "";
+    private string newResearchNotes = "";
+    private List<ResearchEntry> savedResearch = new List<ResearchEntry>
+    {
+        new ResearchEntry { Topic = "Aetheric Energy Manifestation", Notes = "Initial findings suggest a direct correlation between neural resonance and energy output. Further study on Guardian neural patterns required." },
+        new ResearchEntry { Topic = "Ancient Guardian Lore", Notes = "Discovered fragmented texts hinting at a 'Nexus of Souls'. Implications for Guardian creation are profound." }
+    };
+
+    private void AddResearch()
+    {
+        if (!string.IsNullOrWhiteSpace(newResearchTopic) || !string.IsNullOrWhiteSpace(newResearchNotes))
+        {
+            savedResearch.Insert(0, new ResearchEntry { Topic = newResearchTopic, Notes = newResearchNotes });
+            newResearchTopic = "";
+            newResearchNotes = "";
+        }
+    }
+
+    public class ResearchEntry
+    {
+        public string Topic { get; set; }
+        public string Notes { get; set; }
+    }
+}

@@ -1,0 +1,307 @@
+@page "/messages"
+
+<style>
+    .hide-scrollbar::-webkit-scrollbar {
+        display: none;
+    }
+    .hide-scrollbar {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+    }
+    
+    /* Animation for active story rings */
+    .avatar-ring-ecstatic {
+        box-shadow: 0 0 10px rgba(255, 210, 63, 0.4), inset 0 0 4px rgba(255, 210, 63, 0.2);
+    }
+    .avatar-ring-serene {
+        box-shadow: 0 0 10px rgba(0, 219, 236, 0.4), inset 0 0 4px rgba(0, 219, 236, 0.2);
+    }
+    .avatar-ring-miserable {
+        box-shadow: 0 0 10px rgba(255, 180, 171, 0.4), inset 0 0 4px rgba(255, 180, 171, 0.2);
+    }
+</style>
+
+<main class="pt-20 pb-32 px-6 max-w-2xl mx-auto flex-grow h-full w-full relative">
+    <!-- Section Header -->
+    <div class="mb-6 flex items-end justify-between">
+        <h2 class="text-4xl font-extrabold tracking-tighter font-headline text-on-surface">Messages</h2>
+        <span class="text-xs font-label uppercase tracking-[0.2em] text-primary-container/60 mb-1">Online (@(contacts.Count(c => c.IsOnline) + 1))</span>
+    </div>
+
+    <!-- HORIZONTAL ACTIVE STORIES SCROLLBAR -->
+    <div class="flex gap-4 overflow-x-auto hide-scrollbar pb-4 mb-6 border-b border-outline-variant/15 select-none">
+        <!-- MY STATUS CONTROLLER -->
+        <div class="flex flex-col items-center gap-1.5 shrink-0 cursor-pointer active:scale-95 duration-150" @onclick="NavigateToBattery">
+            <div class="relative w-16 h-16 rounded-2xl p-0.5 border-2 border-dashed border-[#FFD23F] flex items-center justify-center bg-surface-container-lowest">
+                <img alt="My Avatar" class="w-full h-full object-cover rounded-xl" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBaKv2ynSrU_e8VTjjOHTm7JJECEkWX04ack4ppeG--CvVyP68vFnQlbMpmefGehlXhgmC0a13Ad8GLJ5S5IvL0W6bh7MhBbSIE6Ad6ushR6rBavD18UXBP6f9V8ewzmTtjA3Wox48fDKnLXyb4xImq1op45hcwsFq4z41JCfdNNNZVViUkJPkWSPGKOcZ98iolypuVZEaLD-GfUpX4HpW6Ydgnj0W0UDQ3VgXOgOVnB9jTM0LXnTYVwgK9AKjp3jMkX0DUWn6eGC0"/>
+                <div class="absolute -bottom-1 -right-1 w-5 h-5 bg-[#FFD23F] text-[#3D2F00] rounded-full border border-surface flex items-center justify-center shadow-lg">
+                    <span class="material-symbols-outlined text-[12px] font-black">sync</span>
+                </div>
+            </div>
+            <span class="text-[10px] font-headline font-bold text-[#FFD23F] tracking-wide mt-0.5">My Status</span>
+        </div>
+
+        @foreach (var contact in contacts)
+        {
+            <div class="flex flex-col items-center gap-1.5 shrink-0 cursor-pointer active:scale-95 duration-150" @onclick="() => OpenStatusModal(contact)">
+                <div class="relative w-16 h-16 p-[3px] rounded-2xl border-2 @(contact.BorderColor) @(contact.RingClass) bg-surface-container-lowest transition-all">
+                    <img alt="Contact Avatar" class="w-full h-full object-cover rounded-xl" src="@contact.Avatar" />
+                    @if (contact.IsOnline)
+                    {
+                        <span class="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-emerald-500 rounded-full border-2 border-surface shadow-md"></span>
+                    }
+                    else
+                    {
+                        <span class="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-outline rounded-full border-2 border-surface shadow-md"></span>
+                    }
+                </div>
+                <span class="text-[10px] font-headline font-bold text-on-surface-variant tracking-wide">@contact.ShortName</span>
+            </div>
+        }
+    </div>
+
+    <!-- Search Bar -->
+    <div class="relative mb-6 group">
+        <div class="absolute inset-y-0 left-4 flex items-center pointer-events-none">
+            <span class="material-symbols-outlined text-outline/60 text-lg">search</span>
+        </div>
+        <input class="w-full py-4 pl-12 pr-6 bg-surface-container-highest border-none rounded-xl text-on-surface placeholder:text-outline/40 focus:ring-1 focus:ring-primary-container/30 transition-all font-body outline-none" placeholder="Search messages or contacts..." type="text" />
+    </div>
+
+    <!-- Threads List -->
+    <div class="space-y-2">
+        <!-- Active Thread - Maya Chen -->
+        <div class="group flex items-center p-4 rounded-xl hover:bg-surface-container transition-all cursor-pointer relative overflow-hidden" @onclick="NavigateToChat">
+            <div class="relative">
+                <div class="w-14 h-14 rounded-full overflow-hidden bg-surface-container-lowest">
+                    <img alt="Contact Avatar" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCHO2ix-EW9vEWMwGC57wDxQwP2n_3Ff2lVH5HGUZ-tXfaVKEqiGzmDAjH2qiAwWv0j1ij1G1BdKw32ploS1r2onqxJ10M8F325tYLgFv3qQ2d2uQMGj7XbZNEyXAnzme4AizMCiz4zMtC5FFcG_HVviddCb2PqpjcHGXtkTBxvLX_T3n5VOO6MqdjV1dzGgMczb8lckoRAxlg-QzBRtx6nPDugywegiOFFxok_pqDokix96LRUJROkBUOYuop7PWdk5yP5RrqfWUA" />
+                </div>
+                <div class="absolute bottom-0 right-0 w-3.5 h-3.5 bg-primary-container rounded-full border-2 border-[#0B0B0B] shadow-[0_0_8px_rgba(255,210,63,0.5)]"></div>
+            </div>
+            <div class="ml-4 flex-1">
+                <div class="flex justify-between items-baseline">
+                    <h3 class="font-bold text-on-surface font-label flex items-center gap-1.5">
+                        Maya Chen
+                        <span class="bg-primary-container/10 text-primary-container px-1 py-0.5 text-[8px] font-bold rounded">🔋 85%</span>
+                    </h3>
+                    <span class="text-[10px] font-medium text-outline/60 uppercase tracking-wider">2m ago</span>
+                </div>
+                <p class="text-sm text-[#FFD23F] font-body line-clamp-1 mt-0.5">That sounds like a lot. Want to talk through it tonight?</p>
+            </div>
+            <div class="ml-3">
+                <div class="w-2 h-2 bg-primary-container rounded-full animate-pulse"></div>
+            </div>
+        </div>
+
+        <!-- Thread - Dr. Amara Okonkwo (Therapist) -->
+        <div class="group flex items-center p-4 rounded-xl hover:bg-surface-container transition-all cursor-pointer border border-emerald-500/10" @onclick="NavigateToChat">
+            <div class="relative">
+                <div class="w-14 h-14 rounded-full overflow-hidden bg-surface-container-lowest">
+                    <img alt="Therapist Avatar" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC0kogkItolNhK4rZki5_aE93CiLlzMIzpeeD36U16gi69zpmCy8xTU29qSLFoAqmCTfc4NzkJUd56lh8-6RNE0suwcf8CU1VVlnoTg1RhgMM1LHWz6t5iNDeyL85R71dt35Axsgt7mlKDxJQ1oNntcKaKGVF160f0d8z72RzpplGr9RgFTIl005jDaxP2mBFU30a9vpN-d7QbNojxLywdtnNNlxBzDpIoemQk0myTfohoEjEj0Q2FX8bDhr_tKnXLKrUYN3sbeFBQ"/>
+                </div>
+                <div class="absolute bottom-0 right-0 w-3.5 h-3.5 bg-emerald-500 rounded-full border-2 border-[#0B0B0B]"></div>
+            </div>
+            <div class="ml-4 flex-1">
+                <div class="flex justify-between items-baseline">
+                    <h3 class="font-bold text-on-surface font-label flex items-center gap-1.5">
+                        Dr. Amara Okonkwo
+                        <span class="bg-emerald-500/10 text-emerald-400 px-1 py-0.5 text-[8px] font-bold rounded">Therapist</span>
+                    </h3>
+                    <span class="text-[10px] font-medium text-outline/60 uppercase tracking-wider">1h ago</span>
+                </div>
+                <p class="text-sm text-outline font-body line-clamp-1 mt-0.5">I'm here when you're ready. How has your social battery been this week?</p>
+            </div>
+        </div>
+
+        <!-- Thread - Jordan Lee -->
+        <div class="group flex items-center p-4 rounded-xl hover:bg-surface-container transition-all cursor-pointer" @onclick="() => OpenStatusModal(contacts[1])">
+            <div class="relative">
+                <div class="w-14 h-14 rounded-full overflow-hidden bg-surface-container-lowest opacity-70">
+                    <img alt="Contact Avatar" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDc3TsRaR2Gh8Sff3DXjoV1ojjQ9OjMfB3dwjuNROyCLTLyxEExE6bvVauiLCaFQWujuuIe4XrhsdHPh1_swv-WnADXWlQ2XSu8eK6dEJeA_Iw4zWQyhhtnD814eudixCtKSQFzrREMFQvmDx4UDjSfgihQHH_KLNfVnthIrmAQU7KpNKqczp9L67hHag6qGoxD8LRK9FLM7DCUoU90YuOB3LUQ-GvTDmRTtgK13kZCAnuIGMnfYO4fCT0jswv5KsHIUgMKc9-azmk"/>
+                </div>
+            </div>
+            <div class="ml-4 flex-1">
+                <div class="flex justify-between items-baseline">
+                    <h3 class="font-bold text-on-surface font-label flex items-center gap-1.5">
+                        Jordan Lee
+                        <span class="bg-error/10 text-error px-1 py-0.5 text-[8px] font-bold rounded animate-pulse">🔋 10%</span>
+                    </h3>
+                    <span class="text-[10px] font-medium text-outline/60 uppercase tracking-wider">Yesterday</span>
+                </div>
+                <p class="text-sm text-outline font-body line-clamp-1 mt-0.5">Need some space today — social battery is basically empty 😅</p>
+            </div>
+        </div>
+
+        <!-- Thread - eQCLIPSE Wellness -->
+        <div class="group flex items-center p-4 rounded-xl hover:bg-surface-container transition-all cursor-pointer" @onclick="() => OpenStatusModal(contacts[2])">
+            <div class="relative">
+                <div class="w-14 h-14 rounded-full overflow-hidden bg-surface-container-lowest">
+                    <img alt="Wellness Assistant Avatar" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA0NR7ltzBiJ-xDPiIRPvQZ3yEjju0A-diXyYVX7979si2IY4fsD0nkzo1N3NrS-v_GhYTgvX49KFS3Nu9g9pvrc18Ewm-IXQ8MFQVfxK86up4TFkmCICZXbAozJGV9meqzIxMwRr9cze1G8VtqMd6YofNgiWBNodWZRzPyaeKyTylWp0qKHi2BOFjWBcYeW1gGSlyof77J-OUZWIDyHbObf5kp01WHK529YxeK7EpsGQJ3cGWnGMl-pckUifubbmli9XTEFdAGWc8"/>
+                </div>
+                <div class="absolute bottom-0 right-0 w-3.5 h-3.5 bg-[#FFD23F] rounded-full border-2 border-[#0B0B0B]"></div>
+            </div>
+            <div class="ml-4 flex-1">
+                <div class="flex justify-between items-baseline">
+                    <h3 class="font-bold text-on-surface font-label flex items-center gap-1.5">
+                        eQCLIPSE Wellness
+                        <span class="bg-primary-container/10 text-primary-container px-1 py-0.5 text-[8px] font-bold rounded">Assistant</span>
+                    </h3>
+                    <span class="text-[10px] font-medium text-outline/60 uppercase tracking-wider">Yesterday</span>
+                </div>
+                <p class="text-sm text-outline font-body line-clamp-1 mt-0.5">Tip: Updating your social battery helps friends know when to reach out.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contact Status Modal -->
+    @if (selectedContact != null)
+    {
+        <div class="fixed inset-0 z-50 bg-[#131313]/70 backdrop-blur-md flex items-center justify-center p-6 animate-fade-in" @onclick="CloseStatusModal">
+            <div class="glass-panel w-full max-w-sm rounded-3xl p-6 border border-outline-variant/20 shadow-[0_15px_45px_rgba(0,0,0,0.8)] relative overflow-hidden flex flex-col items-center text-center animate-scale-up" @onclick:stopPropagation>
+                <button class="absolute top-4 right-4 text-outline/60 hover:text-white p-1 rounded-full hover:bg-surface-container transition-colors" @onclick="CloseStatusModal">
+                    <span class="material-symbols-outlined text-lg">close</span>
+                </button>
+                
+                <div class="absolute top-0 w-full h-32 opacity-15 pointer-events-none rounded-b-full filter blur-[30px]" style="background-color: @(selectedContact.ColorHex);"></div>
+                
+                <div class="relative w-24 h-24 p-[3px] rounded-2xl border-4 @(selectedContact.BorderColor) bg-surface-container-lowest mb-4 mt-2 shadow-lg @(selectedContact.RingClass)">
+                    <img alt="Avatar" class="w-full h-full object-cover rounded-xl" src="@selectedContact.Avatar" />
+                    <span class="absolute -bottom-2 -right-2 w-8 h-8 rounded-full border-2 border-surface flex items-center justify-center text-sm shadow-md shadow-black/40" style="background-color: @(selectedContact.ColorHex);">
+                        @selectedContact.MoodEmoji
+                    </span>
+                </div>
+
+                <h3 class="font-headline font-black text-xl text-on-surface leading-tight">@selectedContact.Name</h3>
+                <span class="text-[10px] font-label text-outline/60 uppercase tracking-widest mt-1">@selectedContact.Role</span>
+
+                <div class="flex gap-3 w-full my-6">
+                    <div class="flex-1 bg-surface-container-low border border-outline-variant/10 rounded-2xl p-3 flex flex-col items-center">
+                        <span class="material-symbols-outlined text-base @(selectedContact.BatteryTextClass)">battery_charging_full</span>
+                        <span class="text-xs font-bold text-on-surface mt-1">@selectedContact.SocialBattery%</span>
+                        <span class="text-[9px] font-label uppercase text-outline/50 mt-0.5">Social Battery</span>
+                    </div>
+                    <div class="flex-1 bg-surface-container-low border border-outline-variant/10 rounded-2xl p-3 flex flex-col items-center">
+                        <span class="material-symbols-outlined text-base" style="color: @(selectedContact.ColorHex);">@selectedContact.MoodIcon</span>
+                        <span class="text-xs font-bold text-on-surface mt-1">@selectedContact.Mood</span>
+                        <span class="text-[9px] font-label uppercase text-outline/50 mt-0.5">Mood</span>
+                    </div>
+                </div>
+
+                <div class="w-full bg-[#131313]/40 border border-outline-variant/10 p-4 rounded-2xl mb-6 relative">
+                    <span class="material-symbols-outlined text-outline/20 absolute top-2 left-2 text-sm select-none">format_quote</span>
+                    <p class="font-body text-sm text-on-surface leading-relaxed italic px-2">
+                        "@selectedContact.StatusText"
+                    </p>
+                </div>
+
+                <button @onclick="() => RouteToContactChat(selectedContact)"
+                        class="w-full py-3 rounded-xl font-headline font-extrabold text-sm shadow-md transition-all active:scale-[0.98]" 
+                        style="background-color: @(selectedContact.ColorHex); color: #3D2F00;">
+                    Send Message
+                </button>
+            </div>
+        </div>
+    }
+</main>
+
+@code {
+    [Inject]
+    private NavigationManager Navigation { get; set; } = default!;
+
+    public class ContactInfo {
+        public string Name { get; set; } = "";
+        public string ShortName { get; set; } = "";
+        public string Avatar { get; set; } = "";
+        public string Role { get; set; } = "";
+        public string StatusText { get; set; } = "";
+        public string Mood { get; set; } = "";
+        public string MoodIcon { get; set; } = "";
+        public string MoodEmoji { get; set; } = "";
+        public int SocialBattery { get; set; }
+        public string ColorHex { get; set; } = "";
+        public string BorderColor { get; set; } = "";
+        public string RingClass { get; set; } = "";
+        public string BatteryTextClass { get; set; } = "";
+        public bool IsOnline { get; set; } = true;
+    }
+
+    private List<ContactInfo> contacts = new() {
+        new ContactInfo {
+            Name = "Sam Rivera",
+            ShortName = "Sam",
+            Avatar = "https://lh3.googleusercontent.com/aida-public/AB6AXuC0kogkItolNhK4rZki5_aE93CiLlzMIzpeeD36U16gi69zpmCy8xTU29qSLFoAqmCTfc4NzkJUd56lh8-6RNE0suwcf8CU1VVlnoTg1RhgMM1LHWz6t5iNDeyL85R71dt35Axsgt7mlKDxJQ1oNntcKaKGVF160f0d8z72RzpplGr9RgFTIl005jDaxP2mBFU30a9vpN-d7QbNojxLywdtnNNlxBzDpIoemQk0myTfohoEjEj0Q2FX8bDhr_tKnXLKrUYN3sbeFBQ",
+            Role = "Close Friend",
+            StatusText = "Taking it slow today. Happy to chat, but keeping things light.",
+            Mood = "Serene",
+            MoodIcon = "self_care",
+            MoodEmoji = "🍃",
+            SocialBattery = 60,
+            ColorHex = "#00dbec",
+            BorderColor = "border-[#00dbec]",
+            RingClass = "avatar-ring-serene",
+            BatteryTextClass = "text-tertiary-container",
+            IsOnline = true
+        },
+        new ContactInfo {
+            Name = "Jordan Lee",
+            ShortName = "Jordan",
+            Avatar = "https://lh3.googleusercontent.com/aida-public/AB6AXuDc3TsRaR2Gh8Sff3DXjoV1ojjQ9OjMfB3dwjuNROyCLTLyxEExE6bvVauiLCaFQWujuuIe4XrhsdHPh1_swv-WnADXWlQ2XSu8eK6dEJeA_Iw4zWQyhhtnD814eudixCtKSQFzrREMFQvmDx4UDjSfgihQHH_KLNfVnthIrmAQU7KpNKqczp9L67hHag6qGoxD8LRK9FLM7DCUoU90YuOB3LUQ-GvTDmRTtgK13kZCAnuIGMnfYO4fCT0jswv5KsHIUgMKc9-azmk",
+            Role = "Friend",
+            StatusText = "Social battery is running on empty. Need a quiet day to recharge.",
+            Mood = "Miserable",
+            MoodIcon = "sentiment_very_dissatisfied",
+            MoodEmoji = "💔",
+            SocialBattery = 10,
+            ColorHex = "#ffb4ab",
+            BorderColor = "border-error",
+            RingClass = "avatar-ring-miserable",
+            BatteryTextClass = "text-error animate-pulse",
+            IsOnline = false
+        },
+        new ContactInfo {
+            Name = "eQCLIPSE Wellness",
+            ShortName = "Wellness",
+            Avatar = "https://lh3.googleusercontent.com/aida-public/AB6AXuA0NR7ltzBiJ-xDPiIRPvQZ3yEjju0A-diXyYVX7979si2IY4fsD0nkzo1N3NrS-v_GhYTgvX49KFS3Nu9g9pvrc18Ewm-IXQ8MFQVfxK86up4TFkmCICZXbAozJGV9meqzIxMwRr9cze1G8VtqMd6YofNgiWBNodWZRzPyaeKyTylWp0qKHi2BOFjWBcYeW1gGSlyof77J-OUZWIDyHbObf5kp01WHK529YxeK7EpsGQJ3cGWnGMl-pckUifubbmli9XTEFdAGWc8",
+            Role = "Wellness Assistant",
+            StatusText = "Remember: it's okay to set boundaries. Your social battery is valid.",
+            Mood = "Cheerful",
+            MoodIcon = "sentiment_satisfied",
+            MoodEmoji = "😊",
+            SocialBattery = 100,
+            ColorHex = "#FFD23F",
+            BorderColor = "border-primary-container",
+            RingClass = "avatar-ring-ecstatic",
+            BatteryTextClass = "text-primary-container",
+            IsOnline = true
+        }
+    };
+
+    private ContactInfo? selectedContact = null;
+
+    private void NavigateToChat()
+    {
+        Navigation.NavigateTo("chat");
+    }
+
+    private void NavigateToBattery()
+    {
+        Navigation.NavigateTo("dm/social-battery-indicator");
+    }
+
+    private void OpenStatusModal(ContactInfo contact)
+    {
+        selectedContact = contact;
+    }
+
+    private void CloseStatusModal()
+    {
+        selectedContact = null;
+    }
+
+    private void RouteToContactChat(ContactInfo contact)
+    {
+        selectedContact = null;
+        Navigation.NavigateTo("chat");
+    }
+}
+
